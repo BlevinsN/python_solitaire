@@ -32,6 +32,9 @@ class Deck:
 		for suit in ["spades", "clubs", "diamonds", "hearts"]:
 			for rank in range(1,14):
 				self.cards.append(Card(rank, suit))
+				
+	def get_cards(self):
+		return self.cards
 
 	def show_deck(self):
 		for card in self.cards:
@@ -41,4 +44,14 @@ class Deck:
 		for index in range(len(self.cards)-1,0,-1):
 			r = random.randint(0,index)
 			self.cards[index], self.cards[r] = self.cards[r], self.cards[index]
+
+class Card_object:
+	def __init__(self, card):
+		self.card = card
+	
+	def card_rank():
+		return card.get_rank()
+
+	def card_suit():
+		return card.get_suit()
 
