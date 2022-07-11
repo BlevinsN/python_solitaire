@@ -13,15 +13,15 @@ class Card:
 
 	def show_card(self):
 		if self.rank == 1:
-			self.rank = "Ace"
+			self.rank = "A"
 		elif self.rank == 11:
-			self.rank = "Jack"
+			self.rank = "J"
 		elif self.rank == 12:
-			self.rank = "Queen"
+			self.rank = "Q"
 		elif self.rank == 13:
-			self.rank = "King"
-		print("{} of {}".format(self.rank, self.suit))
-		return
+			self.rank = "K"
+		return str(("{}{}".format(self.suit,self.rank)))
+
 
 class Deck:
 	def __init__(self):
@@ -29,7 +29,7 @@ class Deck:
 		self.build()
 
 	def build(self):
-		for suit in ["spades", "clubs", "diamonds", "hearts"]:
+		for suit in ["♥","♦","♣","♠"]:
 			for rank in range(1,14):
 				self.cards.append(Card(rank, suit))
 				
@@ -46,8 +46,9 @@ class Deck:
 			self.cards[index], self.cards[r] = self.cards[r], self.cards[index]
 
 class Card_object:
-	def __init__(self, card):
+	def __init__(self, card, position):
 		self.card = card
+		self.position = position
 	
 	def card_rank():
 		return card.get_rank()
