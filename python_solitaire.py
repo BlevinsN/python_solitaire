@@ -6,6 +6,7 @@ class Solitaire:
 	def __init__(self, cards):
 		self.board = np.full((21,7), "  ",dtype=np.dtype('U100'))
 		self.deck = []
+		self.stored = ["","","",""]
 		index = 0
 		for stack in range(0,7):
 			for card in range(stack+1):
@@ -15,13 +16,45 @@ class Solitaire:
 
 		print(self.board)
 		print(self.deck)
+		print(self.stored)
 
 	def make_move(old_column, old_row, new_column, new_row):
+		if check_move(self.board[old_row, old_column], new_column, new_row):
+			return
+
 		return
 
 	def check_move(card, column, row):
 		return 
 
+	def store_card(card):
+		order = ['A','2','3','4','5','6','7','8','9','10','J','Q','K']
+		if card[0] == '♥':
+			if card[1] == 'A':
+				self.stored[0] = card
+			else:
+				if card[1:] == order[order.index(self.stored[1:]) + 1]:
+					self.stored[0] = card
+		elif card[0] == '♦':
+			if card[1] == 'A':
+				self.stored[1] = card
+			else:
+				if card[1:] == order[order.index(self.stored[1:]) + 1]:
+					self.stored[1] = card
+		elif card[0] == '♣':
+			if card[1] == 'A':
+				self.stored[2] = card
+			else:
+				if card[1:] == order[order.index(self.stored[1:]) + 1]:
+					self.stored[2] = card	
+		elif card[0] == '♠'
+			if card[1] == 'A':
+				self.stored[3] = card
+			else:
+				if card[1:] == order[order.index(self.stored[1:]) + 1]:
+					self.stored[3] = card
+					
+		
 BLACK = ( 0, 0, 0)
 WHITE = ( 255, 255, 255)
 GREEN = ( 0, 255, 0)
