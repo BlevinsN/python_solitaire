@@ -18,14 +18,21 @@ class Solitaire:
 		print(self.deck)
 		print(self.stored)
 
-	def make_move(old_column, old_row, new_column, new_row):
-		if check_move(self.board[old_row, old_column], new_column, new_row):
-			return
+	def check_move(self, card, column, row):
+		return True
 
+	def make_move(self, old_column, old_row, new_column):
+		# if not check_move(self.board[old_row, old_column], new_column, new_row):
+		# 	return
+		new_row = 0
+		while self.board[new_row, new_column] != '  ':
+			new_row += 1
+		while self.board[old_row, old_column] != '  ':
+			self.board[new_row, new_column] = self.board[old_row, old_column]
+			self.board[old_row, old_column] = '  '
+			old_row += 1
+			new_row += 1
 		return
-
-	def check_move(card, column, row):
-		return 
 
 	def store_card(card):
 		order = ['A','2','3','4','5','6','7','8','9','10','J','Q','K']
@@ -47,14 +54,14 @@ class Solitaire:
 			else:
 				if card[1:] == order[order.index(self.stored[1:]) + 1]:
 					self.stored[2] = card	
-		elif card[0] == '♠'
+		elif card[0] == '♠':
 			if card[1] == 'A':
 				self.stored[3] = card
 			else:
 				if card[1:] == order[order.index(self.stored[1:]) + 1]:
 					self.stored[3] = card
-					
-		
+
+
 BLACK = ( 0, 0, 0)
 WHITE = ( 255, 255, 255)
 GREEN = ( 0, 255, 0)
@@ -66,9 +73,12 @@ deck.shuffle_deck()
 #deck.show_deck()
 cards = deck.get_cards()
 
-Solitaire(cards)
-
-
+game = Solitaire(cards)
+old_column = int(input("old_column: "))
+old_row = int(input("old_row: "))
+new_column = int(input("new_column: "))
+game.make_move(old_column, old_row, new_column)
+print(game.board)
 # pygame.init()
 
 # width = 800
