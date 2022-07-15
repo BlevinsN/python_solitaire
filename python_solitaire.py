@@ -61,14 +61,14 @@ class Solitaire:
 		return True
 
 	def move_from_deck(self, new_column):
-		if not Solitaire.check_move(self, self.board[old_row, old_column], new_column):
+		if not Solitaire.check_move(self, self.deck[0], new_column):
 			print("Bad Move")
 			return
 		new_row = 0
 		while self.board[new_row, new_column] != '  ':
 			new_row += 1
 		self.board[new_row, new_column] = self.deck[0]
-		self.deck[0].pop()
+		self.deck.pop(0)
 		return
 
 	def make_move(self, old_column, old_row, new_column):
@@ -94,32 +94,58 @@ class Solitaire:
 			if card[1] == 'A':
 				self.stored[0] = card
 			else:
-				if card[1:] == order[order.index(self.stored[1:]) + 1]:
+				if card[1:] == self.order[self.order.index(self.stored[1:]) + 1]:
 					self.stored[0] = card
-		elif card[0] == '♦':
+		if card[0] == '♦':
 			if card[1] == 'A':
 				self.stored[1] = card
 			else:
-				if card[1:] == order[order.index(self.stored[1:]) + 1]:
+				if card[1:] == self.order[self.order.index(self.stored[1:]) + 1]:
 					self.stored[1] = card
-		elif card[0] == '♣':
+		if card[0] == '♣':
 			if card[1] == 'A':
-				self.stored[2] = card
+				self.stored[0] = card
 			else:
-				if card[1:] == order[order.index(self.stored[1:]) + 1]:
-					self.stored[2] = card	
-		elif card[0] == '♠':
+				if card[1:] == self.order[self.order.index(self.stored[1:]) + 1]:
+					self.stored[0] = card
+		if card[0] == '♠':
 			if card[1] == 'A':
-				self.stored[3] = card
+				self.stored[1] = card
 			else:
-				if card[1:] == order[order.index(self.stored[1:]) + 1]:
-					self.stored[3] = card
+				if card[1:] == self.order[self.order.index(self.stored[1:]) + 1]:
+					self.stored[1] = card
 		self.board[row, column] = "  "
 		if row > 0:
 			if self.board[row-1, column][0] == "*":
 				self.board[row-1, column] = self.board[row-1, column][1:]
 
-
+	def store_from_deck(self):
+		card = self.deck[0]
+		if card[0] == '♥':
+			if card[1] == 'A':
+				self.stored[0] = card
+			else:
+				if card[1:] == self.order[self.order.index(self.stored[1:]) + 1]:
+					self.stored[0] = card
+		if card[0] == '♦':
+			if card[1] == 'A':
+				self.stored[1] = card
+			else:
+				if card[1:] == self.order[self.order.index(self.stored[1:]) + 1]:
+					self.stored[1] = card
+		if card[0] == '♣':
+			if card[1] == 'A':
+				self.stored[0] = card
+			else:
+				if card[1:] == self.order[self.order.index(self.stored[1:]) + 1]:
+					self.stored[0] = card
+		if card[0] == '♠':
+			if card[1] == 'A':
+				self.stored[1] = card
+			else:
+				if card[1:] == self.order[self.order.index(self.stored[1:]) + 1]:
+					self.stored[1] = card
+		self.deck.pop(0)
 
 BLACK = ( 0, 0, 0)
 WHITE = ( 255, 255, 255)
@@ -137,10 +163,11 @@ game = Solitaire(cards)
 while(True):
 	game.print_board()
 	print("1: Draw from deck.")
-	print("2: Store a card.")
-	print("3: Move a card on the board.")
-	print("4: Move a card from the deck.")
-	print("5: Move a card from the store.")
+	print("2: Store a card from board.")
+	print("3: Store a card from deck.")
+	print("4: Move a card on the board.")
+	print("5: Move a card from the deck.")
+	print("6: Move a card from the store.")
 	choice = int(input("What would you like to do: "))
 	if choice == 1:
 		game.draw_deck()
@@ -150,17 +177,19 @@ while(True):
 		row = int(input("ROW: "))
 		game.store_card(row, column)
 	elif choice == 3:
+		game.store_from_deck()
+	elif choice == 4:
 		print("You are moving a card. Please select card to move.")
 		column = int(input("COLUMN: "))
 		row = int(input("ROW: "))
 		print("Which column would you like to move it to?")
 		new_column = int(input("COLUMN: "))
 		game.make_move(column, row, new_column)
-	elif choice == 4:
+	elif choice == 5:
 		print("You are moving a card from the deck. Please select column to move this card.")
 		column = int(input("COLUMN: "))
 		game.move_from_deck(column)
-	elif choice == 5:
+	elif choice == 6:
 		print("Functionality not set up yet")
 	else:
 		print("INVALID")
