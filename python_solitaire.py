@@ -29,7 +29,10 @@ class Solitaire:
 				else:
 					print(self.board[x,y],end=' | ')
 			print()
-		print("Deck:",self.deck[0])
+		if len(self.deck) > 0:
+			print("Deck:",self.deck[0])
+		else:
+			print("Deck: EMPTY")
 		print("Storage:", self.stored)
 		return
 
@@ -88,32 +91,36 @@ class Solitaire:
 			new_row += 1
 		return
 
-	def store_card(self, column, row):
+	def store_card(self, column):
+		row = 0
+		while self.board[row, column] != '  ':
+			row += 1
+		row -= 1
 		card = self.board[row, column]
 		if card[0] == '♥':
 			if card[1] == 'A':
 				self.stored[0] = card
 			else:
-				if card[1:] == self.order[self.order.index(self.stored[1:]) + 1]:
+				if card[1:] == self.order[self.order.index(self.stored[0][1:]) + 1]:
 					self.stored[0] = card
 		if card[0] == '♦':
 			if card[1] == 'A':
 				self.stored[1] = card
 			else:
-				if card[1:] == self.order[self.order.index(self.stored[1:]) + 1]:
+				if card[1:] == self.order[self.order.index(self.stored[1][1:]) + 1]:
 					self.stored[1] = card
 		if card[0] == '♣':
 			if card[1] == 'A':
-				self.stored[0] = card
+				self.stored[2] = card
 			else:
-				if card[1:] == self.order[self.order.index(self.stored[1:]) + 1]:
-					self.stored[0] = card
+				if card[1:] == self.order[self.order.index(self.stored[2][1:]) + 1]:
+					self.stored[2] = card
 		if card[0] == '♠':
 			if card[1] == 'A':
-				self.stored[1] = card
+				self.stored[3] = card
 			else:
-				if card[1:] == self.order[self.order.index(self.stored[1:]) + 1]:
-					self.stored[1] = card
+				if card[1:] == self.order[self.order.index(self.stored[3][1:]) + 1]:
+					self.stored[3] = card
 		self.board[row, column] = "  "
 		if row > 0:
 			if self.board[row-1, column][0] == "*":
@@ -125,26 +132,26 @@ class Solitaire:
 			if card[1] == 'A':
 				self.stored[0] = card
 			else:
-				if card[1:] == self.order[self.order.index(self.stored[1:]) + 1]:
+				if card[1:] == self.order[self.order.index(self.stored[0][1:]) + 1]:
 					self.stored[0] = card
 		if card[0] == '♦':
 			if card[1] == 'A':
 				self.stored[1] = card
 			else:
-				if card[1:] == self.order[self.order.index(self.stored[1:]) + 1]:
+				if card[1:] == self.order[self.order.index(self.stored[1][1:]) + 1]:
 					self.stored[1] = card
 		if card[0] == '♣':
 			if card[1] == 'A':
-				self.stored[0] = card
+				self.stored[2] = card
 			else:
-				if card[1:] == self.order[self.order.index(self.stored[1:]) + 1]:
-					self.stored[0] = card
+				if card[1:] == self.order[self.order.index(self.stored[2][1:]) + 1]:
+					self.stored[2] = card
 		if card[0] == '♠':
 			if card[1] == 'A':
-				self.stored[1] = card
+				self.stored[3] = card
 			else:
-				if card[1:] == self.order[self.order.index(self.stored[1:]) + 1]:
-					self.stored[1] = card
+				if card[1:] == self.order[self.order.index(self.stored[3][1:]) + 1]:
+					self.stored[3] = card
 		self.deck.pop(0)
 
 BLACK = ( 0, 0, 0)
@@ -174,8 +181,7 @@ while(True):
 	elif choice == 2:
 		print("You are storing a card. Please select card to store.")
 		column = int(input("COLUMN: "))
-		row = int(input("ROW: "))
-		game.store_card(row, column)
+		game.store_card(column)
 	elif choice == 3:
 		game.store_from_deck()
 	elif choice == 4:
