@@ -7,23 +7,77 @@ class Solitaire:
 		self.board = np.full((21,7), "  ",dtype=np.dtype('U100'))
 		self.deck = []
 		self.stored = ["","","",""]
+		self.order = ['A','2','3','4','5','6','7','8','9','10','J','Q','K']
 		index = 0
 		for stack in range(0,7):
-			for card in range(stack+1):
-				self.board[card, stack] = cards[index].show_card()
+			for card in range(stack):
+				self.board[card, stack] = '*' + cards[index].show_card()
 				index += 1
-		self.deck = [ card.show_card() for card in cards[index:]]
+			self.board[stack, stack] = cards[index].show_card()
+			index += 1
+		self.deck = [ card.show_card() for card in cards[index+1:]]
 
 		print(self.board)
 		print(self.deck)
 		print(self.stored)
 
-	def check_move(self, card, column, row):
+	def print_board(self):
+		for x in range(len(self.board)):
+			for y in range(len(self.board[x])):
+				if self.board[x,y][0] == "*":
+					print("H",end=" |  ")
+				else:
+					print(self.board[x,y],end=' | ')
+			print()
+		print("Deck:",self.deck[0])
+		print("Storage:", self.stored)
+		return
+
+	def draw_deck(self):
+		temp = self.deck.pop(0)
+		self.deck.append(temp)
+		return
+
+	def check_move(self, card, column):
+		new_row = 0
+		if card[0] == '*':
+			return False
+		if self.board[new_row, column] == '  ':
+			if card[1:] == 'K':
+				return True
+			else:
+				return False
+		while self.board[new_row+1, column] != '  ':
+			new_row += 1
+		if card[0] == '♥' or card[0] == '♦':
+			if self.board[new_row, column][0] == '♥' or self.board[new_row, column][0] == '♦':
+				return False
+		if card[0] == '♣' or card[0] == '♠':
+			if self.board[new_row, column][0] == '♣' or self.board[new_row, column][0] == '♠':
+				return False
+		valid_card = self.order[self.order.index(self.board[new_row, column][1:]) - 1]
+		if card[1:] != valid_card:
+			return False
 		return True
 
+	def move_from_deck(self, new_column):
+		if not Solitaire.check_move(self, self.board[old_row, old_column], new_column):
+			print("Bad Move")
+			return
+		new_row = 0
+		while self.board[new_row, new_column] != '  ':
+			new_row += 1
+		self.board[new_row, new_column] = self.deck[0]
+		self.deck[0].pop()
+		return
+
 	def make_move(self, old_column, old_row, new_column):
-		# if not check_move(self.board[old_row, old_column], new_column, new_row):
-		# 	return
+		if not Solitaire.check_move(self, self.board[old_row, old_column], new_column):
+			print("Bad Move")
+			return
+		if old_row > 0:
+			if self.board[old_row-1, old_column][0] == "*":
+				self.board[old_row-1, old_column] = self.board[old_row-1, old_column][1:]
 		new_row = 0
 		while self.board[new_row, new_column] != '  ':
 			new_row += 1
@@ -34,8 +88,8 @@ class Solitaire:
 			new_row += 1
 		return
 
-	def store_card(card):
-		order = ['A','2','3','4','5','6','7','8','9','10','J','Q','K']
+	def store_card(self, column, row):
+		card = self.board[row, column]
 		if card[0] == '♥':
 			if card[1] == 'A':
 				self.stored[0] = card
@@ -60,6 +114,11 @@ class Solitaire:
 			else:
 				if card[1:] == order[order.index(self.stored[1:]) + 1]:
 					self.stored[3] = card
+		self.board[row, column] = "  "
+		if row > 0:
+			if self.board[row-1, column][0] == "*":
+				self.board[row-1, column] = self.board[row-1, column][1:]
+
 
 
 BLACK = ( 0, 0, 0)
@@ -74,12 +133,40 @@ deck.shuffle_deck()
 cards = deck.get_cards()
 
 game = Solitaire(cards)
-old_column = int(input("old_column: "))
-old_row = int(input("old_row: "))
-new_column = int(input("new_column: "))
-game.make_move(old_column, old_row, new_column)
-print(game.board)
-# pygame.init()
+
+while(True):
+	game.print_board()
+	print("1: Draw from deck.")
+	print("2: Store a card.")
+	print("3: Move a card on the board.")
+	print("4: Move a card from the deck.")
+	print("5: Move a card from the store.")
+	choice = int(input("What would you like to do: "))
+	if choice == 1:
+		game.draw_deck()
+	elif choice == 2:
+		print("You are storing a card. Please select card to store.")
+		column = int(input("COLUMN: "))
+		row = int(input("ROW: "))
+		game.store_card(row, column)
+	elif choice == 3:
+		print("You are moving a card. Please select card to move.")
+		column = int(input("COLUMN: "))
+		row = int(input("ROW: "))
+		print("Which column would you like to move it to?")
+		new_column = int(input("COLUMN: "))
+		game.make_move(column, row, new_column)
+	elif choice == 4:
+		print("You are moving a card from the deck. Please select column to move this card.")
+		column = int(input("COLUMN: "))
+		game.move_from_deck(column)
+	elif choice == 5:
+		print("Functionality not set up yet")
+	else:
+		print("INVALID")
+
+
+#pygame.init()
 
 # width = 800
 # height = 800
