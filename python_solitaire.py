@@ -22,7 +22,12 @@ class Solitaire:
 		print(self.stored)
 
 	def print_board(self):
+		print('{:^3}'.format(" "),end=" ")
+		for x in range(len(self.board[0])):
+			print('{:^3}'.format(x),end="|")
+		print()
 		for x in range(len(self.board)):
+			print('{:^3}'.format(x),end="|")
 			found = False
 			for y in range(len(self.board[x])):
 				if self.board[x,y][0] == "*":
