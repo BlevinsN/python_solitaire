@@ -23,12 +23,20 @@ class Solitaire:
 
 	def print_board(self):
 		for x in range(len(self.board)):
+			found = False
 			for y in range(len(self.board[x])):
 				if self.board[x,y][0] == "*":
-					print("H",end=" |  ")
+					print('{:^3}'.format('H'),end="|")
+					found = True
 				else:
-					print(self.board[x,y],end=' | ')
+					if self.board[x,y] != '  ':
+						print('{:^3}'.format(self.board[x,y]),end="|")
+						found = True
+					else:
+						print('{:^3}'.format(self.board[x,y]),end="|")
 			print()
+			if found == False:
+				break
 		if len(self.deck) > 0:
 			print("Deck:",self.deck[0])
 		else:
@@ -175,27 +183,27 @@ while(True):
 	print("4: Move a card on the board.")
 	print("5: Move a card from the deck.")
 	print("6: Move a card from the store.")
-	choice = int(input("What would you like to do: "))
-	if choice == 1:
+	choice = input("What would you like to do: ")
+	if choice == '1':
 		game.draw_deck()
-	elif choice == 2:
+	elif choice == '2':
 		print("You are storing a card. Please select card to store.")
 		column = int(input("COLUMN: "))
 		game.store_card(column)
-	elif choice == 3:
+	elif choice == '3':
 		game.store_from_deck()
-	elif choice == 4:
+	elif choice == '4':
 		print("You are moving a card. Please select card to move.")
 		column = int(input("COLUMN: "))
 		row = int(input("ROW: "))
 		print("Which column would you like to move it to?")
 		new_column = int(input("COLUMN: "))
 		game.make_move(column, row, new_column)
-	elif choice == 5:
+	elif choice == '5':
 		print("You are moving a card from the deck. Please select column to move this card.")
 		column = int(input("COLUMN: "))
 		game.move_from_deck(column)
-	elif choice == 6:
+	elif choice == '6':
 		print("Functionality not set up yet")
 	else:
 		print("INVALID")
