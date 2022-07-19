@@ -46,6 +46,7 @@ class Solitaire:
 			print("Deck:",self.deck[0])
 		else:
 			print("Deck: EMPTY")
+		print("         [0] [1] [2] [3]")
 		print("Storage:", self.stored)
 		return
 
