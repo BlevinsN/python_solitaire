@@ -87,6 +87,17 @@ class Solitaire:
 		self.deck.pop(0)
 		return
 
+	def move_from_store(self, store_column, new_column):
+		if not Solitaire.check_move(self, self.stored[store_column], new_column):
+			print("Bad Move")
+			return
+		new_row = 0
+		while self.board[new_row, new_column] != '  ':
+			new_row += 1
+		self.board[new_row, new_column] = self.stored[store_column]
+		self.stored[store_column] = self.stored[store_column][0] + self.order[self.order.index(self.stored[store_column][1:])-1]
+		return
+
 	def make_move(self, old_column, old_row, new_column):
 		if not Solitaire.check_move(self, self.board[old_row, old_column], new_column):
 			print("Bad Move")
@@ -209,7 +220,10 @@ while(True):
 		column = int(input("COLUMN: "))
 		game.move_from_deck(column)
 	elif choice == '6':
-		print("Functionality not set up yet")
+		print("You are moving a card from the store. Please select the column of the card in store.")
+		stored_card = int(input("STORE COLUMN: "))
+		column = int(input("COLUMN ON BOARD: "))
+		game.move_from_store(stored_card,column)
 	else:
 		print("INVALID")
 
