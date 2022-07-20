@@ -4,6 +4,7 @@ class Card:
 	def __init__(self, rank, suit):
 		self.rank = rank
 		self.suit = suit
+		self.hidden = False
 
 	def get_rank(self):
 		return self.rank
@@ -22,6 +23,12 @@ class Card:
 			self.rank = "K"
 		return str(("{}{}".format(self.suit,self.rank)))
 
+	def is_hidden(self):
+		return self.hidden
+
+	def toggle_hide(self):
+		self.hidden = not self.hidden
+		return
 
 class Deck:
 	def __init__(self):

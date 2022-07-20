@@ -4,22 +4,19 @@ import numpy as np
 
 class Solitaire:
 	def __init__(self, cards):
-		self.board = np.full((21,7), "  ",dtype=np.dtype('U100'))
+		self.board = np.full((21,7), "",dtype=Card)
 		self.deck = []
 		self.stored = ["","","",""]
 		self.order = ['A','2','3','4','5','6','7','8','9','10','J','Q','K']
 		index = 0
 		for stack in range(0,7):
 			for card in range(stack):
-				self.board[card, stack] = '*' + cards[index].show_card()
+				cards[index].toggle_hide()
+				self.board[card, stack] = cards[index]
 				index += 1
-			self.board[stack, stack] = cards[index].show_card()
+			self.board[stack, stack] = cards[index]
 			index += 1
-		self.deck = [ card.show_card() for card in cards[index+1:]]
-
-		print(self.board)
-		print(self.deck)
-		print(self.stored)
+		self.deck = [ card for card in cards[index+1:]]
 
 	def print_board(self):
 		print('{:^3}'.format(" "),end=" ")
@@ -30,20 +27,19 @@ class Solitaire:
 			print('{:^3}'.format(x),end="|")
 			found = False
 			for y in range(len(self.board[x])):
-				if self.board[x,y][0] == "*":
-					print('{:^3}'.format('H'),end="|")
+				if self.board[x,y] != '':
+					if self.board[x,y].is_hidden():
+						print('{:^3}'.format('H'),end="|")
+					else:
+						print('{:^3}'.format(self.board[x,y].show_card()),end="|")
 					found = True
 				else:
-					if self.board[x,y] != '  ':
-						print('{:^3}'.format(self.board[x,y]),end="|")
-						found = True
-					else:
-						print('{:^3}'.format(self.board[x,y]),end="|")
+					print('{:^3}'.format(" "),end="|")
 			print()
 			if found == False:
 				break
 		if len(self.deck) > 0:
-			print("Deck:",self.deck[0])
+			print("Deck:",self.deck[0].show_card())
 		else:
 			print("Deck: EMPTY")
 		print("         [0] [1] [2] [3]")
