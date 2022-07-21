@@ -8,7 +8,7 @@ class Solitaire:
 		self.deck = []
 		self.stored = ["","","",""]
 		cards = Deck()
-		self.ordered_deck = cards.get_cards()
+		self.ordered_deck = [x for x in cards.get_cards()]
 		cards.shuffle_deck()
 		shuffled = cards.get_cards()
 		index = 0
@@ -45,8 +45,13 @@ class Solitaire:
 			print("Deck:",self.deck[0].show_card())
 		else:
 			print("Deck: EMPTY")
-		print("         [0] [1] [2] [3]")
-		print("Storage:", self.stored)
+		print("Storage:", end=" ")
+		for x in self.stored:
+			if type(x) == Card:
+				print(x.show_card(), end=" ")
+			else:
+				print("EMPTY", end=" " )
+		print()
 		return
 
 	def draw_deck(self):
@@ -66,17 +71,16 @@ class Solitaire:
 		while self.board[new_row+1, column] != '':
 			new_row += 1
 		suit = card.get_suit()
-		to_check = self.board[new_row, column].get_suit()
+		to_check = self.board[new_row, column]
 		if suit == '♥' or suit == '♦':
-			if to_check == '♥' or to_check == '♦':
+			if to_check.get_suit() == '♥' or to_check.get_suit() == '♦':
 				return False
 		if suit == '♣' or suit == '♠':
-			if to_check == '♣' or to_check == '♠':
+			if to_check.get_suit() == '♣' or to_check.get_suit() == '♠':
 				return False
-		print(self.ordered_deck)
 		ordered_index = self.ordered_deck.index(card)
-		valid_rank = self.ordered_deck[ordered_index-1].get_rank()
-		if card.get_rank() != valid_rank:
+		valid_rank = self.ordered_deck[ordered_index+1].get_rank()
+		if to_check.get_rank() != valid_rank:
 			return False
 		return True
 
@@ -126,87 +130,111 @@ class Solitaire:
 		if column < 0 or column > len(self.board[0]):
 			return
 		row = 0
-		while self.board[row, column] != '  ':
+		while self.board[row, column] != '':
 			row += 1
 		row -= 1
 		card = self.board[row, column]
-		if card[0] == '♥':
-			if card[1] == 'A':
+		if card.get_suit() == '♥':
+			if card.get_rank() == 'A':
 				self.stored[0] = card
 			elif self.stored[0]:
-				if card[1:] == self.order[self.order.index(self.stored[0][1:]) + 1]:
+				ordered_index = self.ordered_deck.index(self.stored[0])
+				to_check = self.ordered_deck[ordered_index+1]
+				if card.get_rank() == to_check.get_rank():
 					self.stored[0] = card
 				else:
 					return
 			else:
 				return
-		if card[0] == '♦':
-			if card[1] == 'A':
+		if card.get_suit() == '♦':
+			if card.get_rank() == 'A':
 				self.stored[1] = card
 			elif self.stored[1]:
-				if card[1:] == self.order[self.order.index(self.stored[1][1:]) + 1]:
+				ordered_index = self.ordered_deck.index(self.stored[1])
+				to_check = self.ordered_deck[ordered_index+1]
+				if card.get_rank() == to_check.get_rank():
 					self.stored[1] = card
 				else:
 					return
 			else:
 				return
-		if card[0] == '♣':
-			if card[1] == 'A':
+		if card.get_suit() == '♣':
+			if card.get_rank() == 'A':
 				self.stored[2] = card
 			elif self.stored[2]:
-				if card[1:] == self.order[self.order.index(self.stored[2][1:]) + 1]:
+				ordered_index = self.ordered_deck.index(self.stored[2])
+				to_check = self.ordered_deck[ordered_index+1]
+				if card.get_rank() == to_check.get_rank():
 					self.stored[2] = card
 				else:
 					return
 			else:
 				return
-		if card[0] == '♠':
-			if card[1] == 'A':
+		if card.get_suit() == '♠':
+			if card.get_rank() == 'A':
 				self.stored[3] = card
 			elif self.stored[3]:
-				if card[1:] == self.order[self.order.index(self.stored[3][1:]) + 1]:
+				ordered_index = self.ordered_deck.index(self.stored[3])
+				to_check = self.ordered_deck[ordered_index+1]
+				if card.get_rank() == to_check.get_rank():
 					self.stored[3] = card
 				else:
 					return
 			else:
 				return
-		self.board[row, column] = "  "
+		self.board[row, column] = ""
 		if row > 0:
-			if self.board[row-1, column][0] == "*":
-				self.board[row-1, column] = self.board[row-1, column][1:]
+			if self.board[row-1, column].is_hidden():
+				self.board[row-1, column].toggle_hide()
 
 	def store_from_deck(self):
 		card = self.deck[0]
-		if card[0] == '♥':
-			if card[1] == 'A':
+		if card.get_suit() == '♥':
+			if card.get_rank() == 'A':
 				self.stored[0] = card
 			elif self.stored[0]:
-				if card[1:] == self.order[self.order.index(self.stored[0][1:]) + 1]:
+				ordered_index = self.ordered_deck.index(self.stored[0])
+				to_check = self.ordered_deck[ordered_index+1]
+				if card.get_rank() == to_check.get_rank():
 					self.stored[0] = card
+				else:
+					return
 			else:
 				return
-		if card[0] == '♦':
-			if card[1] == 'A':
+		if card.get_suit() == '♦':
+			if card.get_rank() == 'A':
 				self.stored[1] = card
 			elif self.stored[1]:
-				if card[1:] == self.order[self.order.index(self.stored[1][1:]) + 1]:
+				ordered_index = self.ordered_deck.index(self.stored[1])
+				to_check = self.ordered_deck[ordered_index+1]
+				if card.get_rank() == to_check.get_rank():
 					self.stored[1] = card
+				else:
+					return
 			else:
 				return
-		if card[0] == '♣':
-			if card[1] == 'A':
+		if card.get_suit() == '♣':
+			if card.get_rank() == 'A':
 				self.stored[2] = card
 			elif self.stored[2]:
-				if card[1:] == self.order[self.order.index(self.stored[2][1:]) + 1]:
+				ordered_index = self.ordered_deck.index(self.stored[2])
+				to_check = self.ordered_deck[ordered_index+1]
+				if card.get_rank() == to_check.get_rank():
 					self.stored[2] = card
+				else:
+					return
 			else:
 				return
-		if card[0] == '♠':
-			if card[1] == 'A':
+		if card.get_suit() == '♠':
+			if card.get_rank() == 'A':
 				self.stored[3] = card
 			elif self.stored[3]:
-				if card[1:] == self.order[self.order.index(self.stored[3][1:]) + 1]:
+				ordered_index = self.ordered_deck.index(self.stored[3])
+				to_check = self.ordered_deck[ordered_index+1]
+				if card.get_rank() == to_check.get_rank():
 					self.stored[3] = card
+				else:
+					return
 			else:
 				return
 		self.deck.pop(0)
