@@ -3,20 +3,23 @@ from python_card_object import *
 import numpy as np
 
 class Solitaire:
-	def __init__(self, cards):
+	def __init__(self):
 		self.board = np.full((21,7), "",dtype=Card)
 		self.deck = []
 		self.stored = ["","","",""]
-		self.order = ['A','2','3','4','5','6','7','8','9','10','J','Q','K']
+		cards = Deck()
+		self.ordered_deck = cards.get_cards()
+		cards.shuffle_deck()
+		shuffled = cards.get_cards()
 		index = 0
 		for stack in range(0,7):
 			for card in range(stack):
-				cards[index].toggle_hide()
-				self.board[card, stack] = cards[index]
+				shuffled[index].toggle_hide()
+				self.board[card, stack] = shuffled[index]
 				index += 1
-			self.board[stack, stack] = cards[index]
+			self.board[stack, stack] = shuffled[index]
 			index += 1
-		self.deck = [ card for card in cards[index+1:]]
+		self.deck = [ card for card in shuffled[index+1:]]
 
 	def print_board(self):
 		print('{:^3}'.format(" "),end=" ")
@@ -53,23 +56,27 @@ class Solitaire:
 
 	def check_move(self, card, column):
 		new_row = 0
-		if card[0] == '*':
+		if card.is_hidden():
 			return False
-		if self.board[new_row, column] == '  ':
-			if card[1:] == 'K':
+		if self.board[new_row, column] == '':
+			if card.get_rank() == 'K':
 				return True
 			else:
 				return False
-		while self.board[new_row+1, column] != '  ':
+		while self.board[new_row+1, column] != '':
 			new_row += 1
-		if card[0] == '♥' or card[0] == '♦':
-			if self.board[new_row, column][0] == '♥' or self.board[new_row, column][0] == '♦':
+		suit = card.get_suit()
+		to_check = self.board[new_row, column].get_suit()
+		if suit == '♥' or suit == '♦':
+			if to_check == '♥' or to_check == '♦':
 				return False
-		if card[0] == '♣' or card[0] == '♠':
-			if self.board[new_row, column][0] == '♣' or self.board[new_row, column][0] == '♠':
+		if suit == '♣' or suit == '♠':
+			if to_check == '♣' or to_check == '♠':
 				return False
-		valid_card = self.order[self.order.index(self.board[new_row, column][1:]) - 1]
-		if card[1:] != valid_card:
+		print(self.ordered_deck)
+		ordered_index = self.ordered_deck.index(card)
+		valid_rank = self.ordered_deck[ordered_index-1].get_rank()
+		if card.get_rank() != valid_rank:
 			return False
 		return True
 
@@ -78,7 +85,7 @@ class Solitaire:
 			print("Bad Move")
 			return
 		new_row = 0
-		while self.board[new_row, new_column] != '  ':
+		while self.board[new_row, new_column] != '':
 			new_row += 1
 		self.board[new_row, new_column] = self.deck[0]
 		self.deck.pop(0)
@@ -91,10 +98,11 @@ class Solitaire:
 			print("Bad Move")
 			return
 		new_row = 0
-		while self.board[new_row, new_column] != '  ':
+		while self.board[new_row, new_column] != '':
 			new_row += 1
 		self.board[new_row, new_column] = self.stored[store_column]
-		self.stored[store_column] = self.stored[store_column][0] + self.order[self.order.index(self.stored[store_column][1:])-1]
+		ordered_index = self.ordered_deck.index(self.stored[store_column])
+		self.stored[store_column] = self.ordered_deck[ordered_index-1]
 		return
 
 	def make_move(self, old_column, old_row, new_column):
@@ -102,14 +110,14 @@ class Solitaire:
 			print("Bad Move")
 			return
 		if old_row > 0:
-			if self.board[old_row-1, old_column][0] == "*":
-				self.board[old_row-1, old_column] = self.board[old_row-1, old_column][1:]
+			if self.board[old_row-1, old_column].is_hidden():
+				self.board[old_row-1, old_column].toggle_hide()
 		new_row = 0
-		while self.board[new_row, new_column] != '  ':
+		while self.board[new_row, new_column] != '':
 			new_row += 1
-		while self.board[old_row, old_column] != '  ':
+		while self.board[old_row, old_column] != '':
 			self.board[new_row, new_column] = self.board[old_row, old_column]
-			self.board[old_row, old_column] = '  '
+			self.board[old_row, old_column] = ''
 			old_row += 1
 			new_row += 1
 		return
@@ -208,13 +216,7 @@ WHITE = ( 255, 255, 255)
 GREEN = ( 0, 255, 0)
 RED = ( 255, 0, 0)
 
-deck = Deck()
-#deck.show_deck()
-deck.shuffle_deck()
-#deck.show_deck()
-cards = deck.get_cards()
-
-game = Solitaire(cards)
+game = Solitaire()
 
 while(True):
 	game.print_board()
