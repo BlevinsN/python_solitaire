@@ -80,7 +80,14 @@ class Solitaire:
 				return False
 		ordered_index = self.ordered_deck.index(card)
 		valid_rank = self.ordered_deck[ordered_index+1].get_rank()
+		if valid_rank == 11:
+			valid_rank = 'J'
+		elif valid_rank == 12:
+			valid_rank = 'Q'
+		elif valid_rank == 13:
+			valid_rank = 'K'
 		if to_check.get_rank() != valid_rank:
+			print(to_check.get_rank(), valid_rank)
 			return False
 		return True
 
