@@ -19,7 +19,7 @@ class Solitaire:
 				index += 1
 			self.board[stack, stack] = shuffled[index]
 			index += 1
-		self.deck = [ card for card in shuffled[index+1:]]
+		self.deck = shuffled[index:]
 
 	def print_board(self):
 		print('{:^3}'.format(" "),end=" ")
