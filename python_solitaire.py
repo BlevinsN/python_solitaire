@@ -21,6 +21,17 @@ class Solitaire:
 			index += 1
 		self.deck = shuffled[index:]
 
+	def check_win(self):
+		print()
+		for x in self.stored:
+			if x != '':
+				print(x.get_rank(),end=" | ")
+				if x.get_rank() != 'K':
+					print()
+					return False
+		print()
+		return True
+
 	def print_board(self):
 		print('{:^3}'.format(" "),end=" ")
 		for x in range(len(self.board[0])):
@@ -55,8 +66,9 @@ class Solitaire:
 		return
 
 	def draw_deck(self):
-		temp = self.deck.pop(0)
-		self.deck.append(temp)
+		if len(self.deck) > 0:
+			temp = self.deck.pop(0)
+			self.deck.append(temp)
 		return
 
 	def check_move(self, card, column):
@@ -193,6 +205,8 @@ class Solitaire:
 		if row > 0:
 			if self.board[row-1, column].is_hidden():
 				self.board[row-1, column].toggle_hide()
+		if self.check_win():
+			print("WINNER")
 
 	def store_from_deck(self):
 		card = self.deck[0]
@@ -245,6 +259,8 @@ class Solitaire:
 			else:
 				return
 		self.deck.pop(0)
+		if self.check_win():
+			print("WINNER")
 
 BLACK = ( 0, 0, 0)
 WHITE = ( 255, 255, 255)
