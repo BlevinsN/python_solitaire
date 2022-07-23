@@ -21,7 +21,7 @@ class Solitaire:
 			index += 1
 		self.deck = shuffled[index:]
 
-	def check_win(self):
+	def game_over(self):
 		for x in self.stored:
 			if x != '':
 				if x.get_rank() != 'K':
@@ -202,8 +202,6 @@ class Solitaire:
 		if row > 0:
 			if self.board[row-1, column].is_hidden():
 				self.board[row-1, column].toggle_hide()
-		if self.check_win():
-			print("WINNER")
 
 	def store_from_deck(self):
 		if len(self.deck) == 0:
@@ -258,8 +256,6 @@ class Solitaire:
 			else:
 				return
 		self.deck.pop(0)
-		if self.check_win():
-			print("WINNER")
 
 BLACK = ( 0, 0, 0)
 WHITE = ( 255, 255, 255)
@@ -315,6 +311,9 @@ while(True):
 			print("INVALID INPUT")
 	else:
 		print("INVALID")
+	if game.game_over():
+		print("---------- YOU HAVE WON THE GAME ----------")
+		break
 
 
 #pygame.init()
