@@ -22,14 +22,11 @@ class Solitaire:
 		self.deck = shuffled[index:]
 
 	def check_win(self):
-		print()
 		for x in self.stored:
 			if x != '':
-				print(x.get_rank(),end=" | ")
 				if x.get_rank() != 'K':
 					print()
 					return False
-		print()
 		return True
 
 	def print_board(self):
@@ -209,6 +206,8 @@ class Solitaire:
 			print("WINNER")
 
 	def store_from_deck(self):
+		if len(self.deck) == 0:
+			return
 		card = self.deck[0]
 		if card.get_suit() == '♥':
 			if card.get_rank() == 'A':
@@ -281,27 +280,39 @@ while(True):
 	if choice == '1':
 		game.draw_deck()
 	elif choice == '2':
-		print("You are storing a card. Please select card to store.")
-		column = int(input("COLUMN: "))
-		game.store_card(column)
+		try:
+			print("You are storing a card. Please select card to store.")
+			column = int(input("COLUMN: "))
+			game.store_card(column)
+		except:
+			print("INVALID INPUT")
 	elif choice == '3':
 		game.store_from_deck()
 	elif choice == '4':
 		print("You are moving a card. Please select card to move.")
-		column = int(input("COLUMN: "))
-		row = int(input("ROW: "))
-		print("Which column would you like to move it to?")
-		new_column = int(input("COLUMN: "))
-		game.make_move(column, row, new_column)
+		try:
+			column = int(input("COLUMN: "))
+			row = int(input("ROW: "))
+			print("Which column would you like to move it to?")
+			new_column = int(input("COLUMN: "))
+			game.make_move(column, row, new_column)
+		except:
+			print("INVALID INPUT")
 	elif choice == '5':
-		print("You are moving a card from the deck. Please select column to move this card.")
-		column = int(input("COLUMN: "))
-		game.move_from_deck(column)
+		try:
+			print("You are moving a card from the deck. Please select column to move this card.")
+			column = int(input("COLUMN: "))
+			game.move_from_deck(column)
+		except:
+			print("INVALID INPUT")
 	elif choice == '6':
-		print("You are moving a card from the store. Please select the column of the card in store.")
-		stored_card = int(input("STORE COLUMN: "))
-		column = int(input("COLUMN ON BOARD: "))
-		game.move_from_store(stored_card,column)
+		try:
+			print("You are moving a card from the store. Please select the column of the card in store.")
+			stored_card = int(input("STORE COLUMN: "))
+			column = int(input("COLUMN ON BOARD: "))
+			game.move_from_store(stored_card,column)
+		except:
+			print("INVALID INPUT")
 	else:
 		print("INVALID")
 
