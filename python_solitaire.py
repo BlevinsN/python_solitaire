@@ -23,9 +23,10 @@ class Solitaire:
 
 	def game_over(self):
 		for x in self.stored:
-			if x != '':
-				if x.get_rank() != 'K':
-					print()
+			if x == '':
+				return False
+			else:
+				if x.get_rank() != 'K': 
 					return False
 		return True
 
