@@ -30,7 +30,43 @@ class Solitaire:
 					return False
 		return True
 
-	def print_board(self):
+	def print_board(self, screen):
+
+		font = pygame.font.Font(None, 12)
+		buffer = 10
+		row_width = (width / 7) - (2*buffer)
+		card_width = row_width - (2*buffer)
+		row_height = card_width * (5/4)
+		card_height = row_height - buffer
+
+		vert_slice0 = pygame.Rect(0*(width/7)+buffer, 0, row_width, height)
+		vert_slice1 = pygame.Rect(1*(width/7)+buffer, 0, row_width, height)
+		vert_slice2 = pygame.Rect(2*(width/7)+buffer, 0, row_width, height)
+		vert_slice3 = pygame.Rect(3*(width/7)+buffer, 0, row_width, height)
+		vert_slice4 = pygame.Rect(4*(width/7)+buffer, 0, row_width, height)
+		vert_slice5 = pygame.Rect(5*(width/7)+buffer, 0, row_width, height)
+		vert_slice6 = pygame.Rect(6*(width/7)+buffer, 0, row_width, height)
+
+		horz_slice0 = pygame.Rect(0, (0*row_height)+buffer, width, row_height)
+		horz_slice1 = pygame.Rect(0, (1*row_height)+buffer, width, row_height)
+		horz_slice2 = pygame.Rect(0, (2*row_height)+buffer, width, row_height)
+		horz_slice3 = pygame.Rect(0, (3*row_height)+buffer, width, row_height)
+		horz_slice4 = pygame.Rect(0, (4*row_height)+buffer, width, row_height)
+		horz_slice5 = pygame.Rect(0, (5*row_height)+buffer, width, row_height)
+		horz_slice6 = pygame.Rect(0, (6*row_height)+buffer, width, row_height)
+
+		x_pos = [vert_slice0, vert_slice1, vert_slice2, vert_slice3, vert_slice4, vert_slice5, vert_slice6]
+		y_pos = [horz_slice0, horz_slice1, horz_slice2, horz_slice3, horz_slice4, horz_slice5, horz_slice6]
+
+		heart_stored = pygame.Rect(vert_slice3.x, horz_slice0.y, card_width, card_height)
+		diamond_stored = pygame.Rect(vert_slice4.x, horz_slice0.y, card_width, card_height)
+		spade_stored = pygame.Rect(vert_slice5.x, horz_slice0.y, card_width, card_height)
+		club_stored = pygame.Rect(vert_slice6.x, horz_slice0.y, card_width, card_height)
+
+		deck_hidden = pygame.Rect(vert_slice0.x, horz_slice6.y, card_width, card_height)
+		deck_showing = pygame.Rect(vert_slice1.x, horz_slice6.y, card_width, card_height)
+		screen.fill(BLACK)
+
 		print('{:^3}'.format(" "),end=" ")
 		for x in range(len(self.board[0])):
 			print('{:^3}'.format(x),end="|")
@@ -50,17 +86,56 @@ class Solitaire:
 			print()
 			if found == False:
 				break
+
+		pygame.draw.rect(screen, WHITE, deck_hidden)
+		pygame.draw.rect(screen, WHITE, deck_showing)
 		if len(self.deck) > 0:
+			text = font.render(self.deck[0].show_card(), True, BLACK, WHITE)
 			print("Deck:",self.deck[0].show_card())
 		else:
 			print("Deck: EMPTY")
 		print("Storage:", end=" ")
-		for x in self.stored:
-			if type(x) == Card:
-				print(x.show_card(), end=" ")
-			else:
-				print("EMPTY", end=" " )
+		pygame.draw.rect(screen, WHITE, heart_stored)
+		pygame.draw.rect(screen, WHITE, diamond_stored)
+		pygame.draw.rect(screen, WHITE, spade_stored)
+		pygame.draw.rect(screen, WHITE, club_stored)
+		if type(self.stored[0]) == Card:
+			pygame.draw.rect(screen, WHITE, heart_stored)
+			text = font.render(self.stored[0].show_card(), True, BLACK, WHITE)
+			screen.blit(text, heart_stored)
+			print(self.stored[0].show_card(), end=" ")
+		else:
+			print("EMPTY", end=" " )
 		print()
+		if type(self.stored[1]) == Card:
+			pygame.draw.rect(screen, WHITE, diamond_stored)
+			text = font.render(self.stored[1].show_card(), True, BLACK, WHITE)
+			screen.blit(text, diamond_stored)
+			print(self.stored[1].show_card(), end=" ")
+		else:
+			print("EMPTY", end=" " )
+		print()
+		if type(self.stored[2]) == Card:
+			pygame.draw.rect(screen, WHITE, spade_stored)
+			text = font.render(self.stored[2].show_card(), True, BLACK, WHITE)
+			screen.blit(text, spade_stored)
+			print(self.stored[2].show_card(), end=" ")
+		else:
+			print("EMPTY", end=" " )
+		print()
+		if type(self.stored[3]) == Card:
+			pygame.draw.rect(screen, WHITE, club_stored)
+			text = font.render(self.stored[3].show_card(), True, BLACK, WHITE)
+			screen.blit(text, club_stored)
+			print(self.stored[3].show_card(), end=" ")
+		else:
+			print("EMPTY", end=" " )
+		print()
+
+
+
+
+
 		return
 
 	def draw_deck(self):
@@ -265,8 +340,67 @@ RED = ( 255, 0, 0)
 
 game = Solitaire()
 
-while(True):
-	game.print_board()
+# while(True):
+# 	game.print_board()
+# 	print("1: Draw from deck.")
+# 	print("2: Store a card from board.")
+# 	print("3: Store a card from deck.")
+# 	print("4: Move a card on the board.")
+# 	print("5: Move a card from the deck.")
+# 	print("6: Move a card from the store.")
+# 	choice = input("What would you like to do: ")
+# 	if choice == '1':
+# 		game.draw_deck()
+# 	elif choice == '2':
+# 		try:
+# 			print("You are storing a card. Please select card to store.")
+# 			column = int(input("COLUMN: "))
+# 			game.store_card(column)
+# 		except:
+# 			print("INVALID INPUT")
+# 	elif choice == '3':
+# 		game.store_from_deck()
+# 	elif choice == '4':
+# 		print("You are moving a card. Please select card to move.")
+# 		try:
+# 			column = int(input("COLUMN: "))
+# 			row = int(input("ROW: "))
+# 			print("Which column would you like to move it to?")
+# 			new_column = int(input("COLUMN: "))
+# 			game.make_move(column, row, new_column)
+# 		except:
+# 			print("INVALID INPUT")
+# 	elif choice == '5':
+# 		try:
+# 			print("You are moving a card from the deck. Please select column to move this card.")
+# 			column = int(input("COLUMN: "))
+# 			game.move_from_deck(column)
+# 		except:
+# 			print("INVALID INPUT")
+# 	elif choice == '6':
+# 		try:
+# 			print("You are moving a card from the store. Please select the column of the card in store.")
+# 			stored_card = int(input("STORE COLUMN: "))
+# 			column = int(input("COLUMN ON BOARD: "))
+# 			game.move_from_store(stored_card,column)
+# 		except:
+# 			print("INVALID INPUT")
+# 	else:
+# 		print("INVALID")
+# 	if game.game_over():
+# 		print("---------- YOU HAVE WON THE GAME ----------")
+# 		break
+
+pygame.init()
+width = 800
+height = 800
+size = (width,height)
+screen = pygame.display.set_mode(size)
+pygame.display.set_caption("Python Solitaire")
+carryOn = True
+while carryOn:
+	clock = pygame.time.Clock()
+	game.print_board(screen)
 	print("1: Draw from deck.")
 	print("2: Store a card from board.")
 	print("3: Store a card from deck.")
@@ -316,91 +450,23 @@ while(True):
 		print("---------- YOU HAVE WON THE GAME ----------")
 		break
 
-
-#pygame.init()
-
-# width = 800
-# height = 800
-# size = (width,height)
-# screen = pygame.display.set_mode(size)
-# font = pygame.font.Font(None, 12)
-# buffer = 10
-# row_width = (width / 7) - (2*buffer)
-# card_width = row_width - (2*buffer)
-# row_height = card_width * (5/4)
-# card_height = row_height - buffer
-# pygame.display.set_caption("Python Solitaire")
-
-# carryOn = True
-# clock = pygame.time.Clock()
-
-# vert_slice0 = pygame.Rect(0*(width/7)+buffer, 0, row_width, height)
-# vert_slice1 = pygame.Rect(1*(width/7)+buffer, 0, row_width, height)
-# vert_slice2 = pygame.Rect(2*(width/7)+buffer, 0, row_width, height)
-# vert_slice3 = pygame.Rect(3*(width/7)+buffer, 0, row_width, height)
-# vert_slice4 = pygame.Rect(4*(width/7)+buffer, 0, row_width, height)
-# vert_slice5 = pygame.Rect(5*(width/7)+buffer, 0, row_width, height)
-# vert_slice6 = pygame.Rect(6*(width/7)+buffer, 0, row_width, height)
-
-# horz_slice0 = pygame.Rect(0, (0*row_height)+buffer, width, row_height)
-# horz_slice1 = pygame.Rect(0, (1*row_height)+buffer, width, row_height)
-# horz_slice2 = pygame.Rect(0, (2*row_height)+buffer, width, row_height)
-# horz_slice3 = pygame.Rect(0, (3*row_height)+buffer, width, row_height)
-# horz_slice4 = pygame.Rect(0, (4*row_height)+buffer, width, row_height)
-# horz_slice5 = pygame.Rect(0, (5*row_height)+buffer, width, row_height)
-# horz_slice6 = pygame.Rect(0, (6*row_height)+buffer, width, row_height)
-
-# x_pos = [vert_slice0, vert_slice1, vert_slice2, vert_slice3, vert_slice4, vert_slice5, vert_slice6]
-# y_pos = [horz_slice0, horz_slice1, horz_slice2, horz_slice3, horz_slice4, horz_slice5, horz_slice6]
-
-# while carryOn:
-# 	for event in pygame.event.get():
-# 		if event.type == pygame.QUIT:
-# 			carryOn = False
-
-# 	screen.fill(BLACK)
+	for event in pygame.event.get():
+		if event.type == pygame.QUIT:
+			carryOn = False
 	
-# 	suit1 = pygame.Rect(vert_slice3.x, horz_slice0.y, card_width, card_height)
-# 	suit2 = pygame.Rect(vert_slice4.x, horz_slice0.y, card_width, card_height)
-# 	suit3 = pygame.Rect(vert_slice5.x, horz_slice0.y, card_width, card_height)
-# 	suit4 = pygame.Rect(vert_slice6.x, horz_slice0.y, card_width, card_height)
 
-# 	deck_hidden = pygame.Rect(vert_slice0.x, horz_slice6.y, card_width, card_height)
-# 	deck_showing = pygame.Rect(vert_slice1.x, horz_slice6.y, card_width, card_height)
+	# for stack in range(0,7):
+	# 	for card in range(stack+1):
+	# 		rect = pygame.Rect(x_pos[stack].x, horz_slice1.y + (card*buffer), card_width, card_height)
+	# 		if card % 2 == 0:
+	# 			text = font.render("K", True, BLACK, WHITE)
+	# 			pygame.draw.rect(screen, WHITE, rect)
+	# 		else:
+	# 			text = font.render("K", True, BLACK, RED)
+	# 			pygame.draw.rect(screen, RED, rect)
+	# 		screen.blit(text, rect)
 
-# 	# card1 = pygame.Rect(vert_slice0.x, horz_slice1.y, card_width, card_height)
-# 	# card2 = pygame.Rect(vert_slice1.x, horz_slice1.y, card_width, card_height)
-# 	# card3 = pygame.Rect(vert_slice2.x, horz_slice1.y, card_width, card_height)
-# 	# card4 = pygame.Rect(vert_slice3.x, horz_slice1.y, card_width, card_height)
-# 	# card5 = pygame.Rect(vert_slice4.x, horz_slice1.y, card_width, card_height)
-# 	# card6 = pygame.Rect(vert_slice5.x, horz_slice1.y, card_width, card_height)
-# 	# card7 = pygame.Rect(vert_slice6.x, horz_slice1.y, card_width, card_height)
+	pygame.display.flip()
+	clock.tick(60)
 
-# 	for stack in range(0,7):
-# 		for card in range(stack+1):
-# 			rect = pygame.Rect(x_pos[stack].x, horz_slice1.y + (card*buffer), card_width, card_height)
-# 			if card % 2 == 0:
-# 				pygame.draw.rect(screen, WHITE, rect)
-# 			else:
-# 				pygame.draw.rect(screen, RED, rect)
-
-# 	pygame.draw.rect(screen, WHITE, suit1)
-# 	pygame.draw.rect(screen, WHITE, suit2)
-# 	pygame.draw.rect(screen, WHITE, suit3)
-# 	pygame.draw.rect(screen, WHITE, suit4)
-
-# 	# pygame.draw.rect(screen, WHITE, card1)
-# 	# pygame.draw.rect(screen, WHITE, card2)
-# 	# pygame.draw.rect(screen, WHITE, card3)
-# 	# pygame.draw.rect(screen, WHITE, card4)
-# 	# pygame.draw.rect(screen, WHITE, card5)
-# 	# pygame.draw.rect(screen, WHITE, card6)
-# 	# pygame.draw.rect(screen, WHITE, card7)
-	
-# 	pygame.draw.rect(screen, WHITE, deck_hidden)
-# 	pygame.draw.rect(screen, WHITE, deck_showing)
-
-# 	pygame.display.flip()
-# 	clock.tick(60)
-
-# pygame.quit()
+pygame.quit()
