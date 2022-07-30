@@ -40,6 +40,17 @@ class Solitaire:
 				storage.append("EMPTY")
 		return storage
 
+	def get_deck_cards(self):
+		if len(self.deck) > 1:
+			return [self.deck[0].show_card(), self.deck[1].show_card()]
+		elif len(self.deck) > 0:
+			return [self.deck[0].show_card(), "EMPTY"]
+		else:
+			return ["EMPTY", "EMPTY"]
+
+	def get_board(self):
+		return self.board
+
 	def print_board(self, screen):
 
 		print('{:^3}'.format(" "),end=" ")
@@ -386,7 +397,7 @@ while carryOn:
 
 	# for stack in range(0,7):
 	# 	for card in range(stack+1):
-	# 		rect = pygame.Rect(x_pos[stack].x, horz_slice1.y + (card*buffer), card_width, card_height)
+	# 		rect = pygame.Rect(x_pos[stack].x, horz_slice1.y + (card*self.buffer), card_width, card_height)
 	# 		if card % 2 == 0:
 	# 			text = font.render("K", True, BLACK, WHITE)
 	# 			pygame.draw.rect(screen, WHITE, rect)
