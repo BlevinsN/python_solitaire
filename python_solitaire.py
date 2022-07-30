@@ -1,5 +1,6 @@
 import pygame
 from python_card_object import *
+from pygame_solitaire_manager import *
 import numpy as np
 
 class Solitaire:
@@ -30,42 +31,16 @@ class Solitaire:
 					return False
 		return True
 
+	def get_storage(self):
+		storage = []
+		for suit in self.stored:
+			if type(suit) == Card:
+				storage.append(suit.show_card())
+			else:
+				storage.append("EMPTY")
+		return storage
+
 	def print_board(self, screen):
-
-		font = pygame.font.Font(None, 12)
-		buffer = 10
-		row_width = (width / 7) - (2*buffer)
-		card_width = row_width - (2*buffer)
-		row_height = card_width * (5/4)
-		card_height = row_height - buffer
-
-		vert_slice0 = pygame.Rect(0*(width/7)+buffer, 0, row_width, height)
-		vert_slice1 = pygame.Rect(1*(width/7)+buffer, 0, row_width, height)
-		vert_slice2 = pygame.Rect(2*(width/7)+buffer, 0, row_width, height)
-		vert_slice3 = pygame.Rect(3*(width/7)+buffer, 0, row_width, height)
-		vert_slice4 = pygame.Rect(4*(width/7)+buffer, 0, row_width, height)
-		vert_slice5 = pygame.Rect(5*(width/7)+buffer, 0, row_width, height)
-		vert_slice6 = pygame.Rect(6*(width/7)+buffer, 0, row_width, height)
-
-		horz_slice0 = pygame.Rect(0, (0*row_height)+buffer, width, row_height)
-		horz_slice1 = pygame.Rect(0, (1*row_height)+buffer, width, row_height)
-		horz_slice2 = pygame.Rect(0, (2*row_height)+buffer, width, row_height)
-		horz_slice3 = pygame.Rect(0, (3*row_height)+buffer, width, row_height)
-		horz_slice4 = pygame.Rect(0, (4*row_height)+buffer, width, row_height)
-		horz_slice5 = pygame.Rect(0, (5*row_height)+buffer, width, row_height)
-		horz_slice6 = pygame.Rect(0, (6*row_height)+buffer, width, row_height)
-
-		x_pos = [vert_slice0, vert_slice1, vert_slice2, vert_slice3, vert_slice4, vert_slice5, vert_slice6]
-		y_pos = [horz_slice0, horz_slice1, horz_slice2, horz_slice3, horz_slice4, horz_slice5, horz_slice6]
-
-		heart_stored = pygame.Rect(vert_slice3.x, horz_slice0.y, card_width, card_height)
-		diamond_stored = pygame.Rect(vert_slice4.x, horz_slice0.y, card_width, card_height)
-		spade_stored = pygame.Rect(vert_slice5.x, horz_slice0.y, card_width, card_height)
-		club_stored = pygame.Rect(vert_slice6.x, horz_slice0.y, card_width, card_height)
-
-		deck_hidden = pygame.Rect(vert_slice0.x, horz_slice6.y, card_width, card_height)
-		deck_showing = pygame.Rect(vert_slice1.x, horz_slice6.y, card_width, card_height)
-		screen.fill(BLACK)
 
 		print('{:^3}'.format(" "),end=" ")
 		for x in range(len(self.board[0])):
@@ -87,54 +62,10 @@ class Solitaire:
 			if found == False:
 				break
 
-		pygame.draw.rect(screen, WHITE, deck_hidden)
-		pygame.draw.rect(screen, WHITE, deck_showing)
 		if len(self.deck) > 0:
-			text = font.render(self.deck[0].show_card(), True, BLACK, WHITE)
 			print("Deck:",self.deck[0].show_card())
 		else:
 			print("Deck: EMPTY")
-		print("Storage:", end=" ")
-		pygame.draw.rect(screen, WHITE, heart_stored)
-		pygame.draw.rect(screen, WHITE, diamond_stored)
-		pygame.draw.rect(screen, WHITE, spade_stored)
-		pygame.draw.rect(screen, WHITE, club_stored)
-		if type(self.stored[0]) == Card:
-			pygame.draw.rect(screen, WHITE, heart_stored)
-			text = font.render(self.stored[0].show_card(), True, BLACK, WHITE)
-			screen.blit(text, heart_stored)
-			print(self.stored[0].show_card(), end=" ")
-		else:
-			print("EMPTY", end=" " )
-		print()
-		if type(self.stored[1]) == Card:
-			pygame.draw.rect(screen, WHITE, diamond_stored)
-			text = font.render(self.stored[1].show_card(), True, BLACK, WHITE)
-			screen.blit(text, diamond_stored)
-			print(self.stored[1].show_card(), end=" ")
-		else:
-			print("EMPTY", end=" " )
-		print()
-		if type(self.stored[2]) == Card:
-			pygame.draw.rect(screen, WHITE, spade_stored)
-			text = font.render(self.stored[2].show_card(), True, BLACK, WHITE)
-			screen.blit(text, spade_stored)
-			print(self.stored[2].show_card(), end=" ")
-		else:
-			print("EMPTY", end=" " )
-		print()
-		if type(self.stored[3]) == Card:
-			pygame.draw.rect(screen, WHITE, club_stored)
-			text = font.render(self.stored[3].show_card(), True, BLACK, WHITE)
-			screen.blit(text, club_stored)
-			print(self.stored[3].show_card(), end=" ")
-		else:
-			print("EMPTY", end=" " )
-		print()
-
-
-
-
 
 		return
 
@@ -333,11 +264,6 @@ class Solitaire:
 				return
 		self.deck.pop(0)
 
-BLACK = ( 0, 0, 0)
-WHITE = ( 255, 255, 255)
-GREEN = ( 0, 255, 0)
-RED = ( 255, 0, 0)
-
 game = Solitaire()
 
 # while(True):
@@ -397,10 +323,13 @@ height = 800
 size = (width,height)
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Python Solitaire")
+
+game_manager = Pygame_Solitaire_Manager(screen)
 carryOn = True
 while carryOn:
 	clock = pygame.time.Clock()
 	game.print_board(screen)
+	game_manager.update_screen(game)
 	print("1: Draw from deck.")
 	print("2: Store a card from board.")
 	print("3: Store a card from deck.")
@@ -450,9 +379,9 @@ while carryOn:
 		print("---------- YOU HAVE WON THE GAME ----------")
 		break
 
-	for event in pygame.event.get():
-		if event.type == pygame.QUIT:
-			carryOn = False
+	# for event in pygame.event.get():
+	# 	if event.type == pygame.QUIT:
+	# 		carryOn = False
 	
 
 	# for stack in range(0,7):
@@ -465,8 +394,7 @@ while carryOn:
 	# 			text = font.render("K", True, BLACK, RED)
 	# 			pygame.draw.rect(screen, RED, rect)
 	# 		screen.blit(text, rect)
-
-	pygame.display.flip()
 	clock.tick(60)
+	pygame.display.flip()
 
 pygame.quit()
