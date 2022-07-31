@@ -1,5 +1,6 @@
 import pygame
 from python_card_object import *
+import numpy as np
 
 BLACK = ( 0, 0, 0)
 WHITE = ( 255, 255, 255)
@@ -47,7 +48,7 @@ class Pygame_Solitaire_Manager:
 		self.deck_hidden = pygame.Rect(self.vert_slice0.x, self.horz_slice6.y, self.card_width, self.card_height)
 		self.deck_showing = pygame.Rect(self.vert_slice1.x, self.horz_slice6.y, self.card_width, self.card_height)
 
-	def update_screen(self, game):
+	def update_screen(self, game, omit=None):
 		self.screen.fill(BLACK)
 		storage = [self.heart_stored, self.diamond_stored, self.spade_stored, self.club_stored]
 		game_storage = game.get_storage()
@@ -70,12 +71,13 @@ class Pygame_Solitaire_Manager:
 			for card in range(len(game_board[stack])):
 				rect = pygame.Rect(self.x_pos[card].x, self.horz_slice1.y + (stack*self.buffer)+30, self.card_width, self.card_height)
 				if type(game_board[stack][card]) == Card:
-					pygame.draw.rect(self.screen, WHITE, rect)
-					if game_board[stack][card].is_hidden():
-						text = self.font.render( '', True, BLACK, WHITE)
-					else:
-						text = self.font.render( game_board[stack][card].show_card(), True, BLACK, WHITE)
-					self.screen.blit(text, rect)
+					if game_board[stack][card] != omit:
+						pygame.draw.rect(self.screen, WHITE, rect)
+						if game_board[stack][card].is_hidden():
+							text = self.font.render( '', True, BLACK, WHITE)
+						else:
+							text = self.font.render( game_board[stack][card].show_card(), True, BLACK, WHITE)
+						self.screen.blit(text, rect)
 		return
 
 	def drag_cards(self, game, mouse_event,clock):
@@ -99,12 +101,17 @@ class Pygame_Solitaire_Manager:
 				for event in pygame.event.get():
 					if event.type == pygame.MOUSEBUTTONUP:
 						if event.button == 1:
+							new_location = find_card(game,event)
+							if new_location:
+								old_x, old_y = np.where(game.get_board() == to_move[1])
+								new_x, new_y = np.where(game.get_board() == new_location[1])
+								return [old_x[0], old_y[0], new_x[0], new_y[0]]
 							dragging = False
 					elif event.type == pygame.MOUSEMOTION:
 						mouse_x, mouse_y = event.pos
 						to_move[0].x = mouse_x + offset_x
 						to_move[0].y = mouse_y + offset_y
-				self.update_screen(game)
+				self.update_screen(game, to_move[1])
 				pygame.draw.rect(self.screen, WHITE, to_move[0])
 				text = self.font.render( to_move[1].show_card(), True, BLACK, WHITE)
 				self.screen.blit(text, to_move[0])

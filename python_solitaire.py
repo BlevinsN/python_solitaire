@@ -88,6 +88,8 @@ class Solitaire:
 
 	def check_move(self, card, column):
 		new_row = 0
+		if type(card) != Card:
+			return False
 		if card.is_hidden():
 			return False
 		if self.board[new_row, column] == '':
@@ -339,7 +341,7 @@ game_manager = Pygame_Solitaire_Manager(screen)
 carryOn = True
 clock = pygame.time.Clock()
 while carryOn:
-	# game.print_board(screen)
+	game.print_board(screen)
 	# print("1: Draw from deck.")
 	# print("2: Store a card from board.")
 	# print("3: Store a card from deck.")
@@ -395,7 +397,8 @@ while carryOn:
 			carryOn = False
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 			if event.button == 1:
-				game_manager.drag_cards(game, event, clock)
+				move = game_manager.drag_cards(game, event, clock)
+				game.make_move(move[0],move[1],move[2])
 
 	
 	clock.tick(60)
