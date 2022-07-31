@@ -68,9 +68,58 @@ class Pygame_Solitaire_Manager:
 		game_board = game.get_board()
 		for stack in range(len(game_board)):
 			for card in range(len(game_board[stack])):
-				rect = pygame.Rect(self.x_pos[card].x, self.horz_slice1.y + (stack*self.buffer), self.card_width, self.card_height)
+				rect = pygame.Rect(self.x_pos[card].x, self.horz_slice1.y + (stack*self.buffer)+30, self.card_width, self.card_height)
 				if type(game_board[stack][card]) == Card:
 					pygame.draw.rect(self.screen, WHITE, rect)
-					text = self.font.render( game_board[stack][card].show_card(), True, BLACK, WHITE)
+					if game_board[stack][card].is_hidden():
+						text = self.font.render( '', True, BLACK, WHITE)
+					else:
+						text = self.font.render( game_board[stack][card].show_card(), True, BLACK, WHITE)
 					self.screen.blit(text, rect)
 		return
+
+	def drag_cards(self, game, mouse_event,clock):
+		def find_card(game, mouse_event):
+			game_board = game.get_board()
+			for stack in range(len(game_board)):
+				for card in range(len(game_board[stack])):
+					rect = pygame.Rect(self.x_pos[card].x, self.horz_slice1.y + (stack*self.buffer)+30, self.card_width, self.card_height)
+					if type(game_board[stack][card]) == Card:
+						if not game_board[stack][card].is_hidden():
+							if rect.collidepoint(mouse_event.pos):
+								return [rect, game_board[stack][card]]
+			return
+		to_move = find_card(game, mouse_event)
+		if to_move:
+			dragging = True
+			mouse_x, mouse_y = mouse_event.pos
+			offset_x = to_move[0].x - mouse_x
+			offset_y = to_move[0].y - mouse_y
+			while dragging:
+				for event in pygame.event.get():
+					if event.type == pygame.MOUSEBUTTONUP:
+						if event.button == 1:
+							dragging = False
+					elif event.type == pygame.MOUSEMOTION:
+						mouse_x, mouse_y = event.pos
+						to_move[0].x = mouse_x + offset_x
+						to_move[0].y = mouse_y + offset_y
+				self.update_screen(game)
+				pygame.draw.rect(self.screen, WHITE, to_move[0])
+				text = self.font.render( to_move[1].show_card(), True, BLACK, WHITE)
+				self.screen.blit(text, to_move[0])
+				pygame.display.flip()
+				clock.tick(60)
+			return
+
+
+
+
+
+
+
+
+
+
+
+

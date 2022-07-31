@@ -337,74 +337,67 @@ pygame.display.set_caption("Python Solitaire")
 
 game_manager = Pygame_Solitaire_Manager(screen)
 carryOn = True
+clock = pygame.time.Clock()
 while carryOn:
-	clock = pygame.time.Clock()
-	game.print_board(screen)
+	# game.print_board(screen)
+	# print("1: Draw from deck.")
+	# print("2: Store a card from board.")
+	# print("3: Store a card from deck.")
+	# print("4: Move a card on the board.")
+	# print("5: Move a card from the deck.")
+	# print("6: Move a card from the store.")
+	# choice = input("What would you like to do: ")
+	# if choice == '1':
+	# 	game.draw_deck()
+	# elif choice == '2':
+	# 	try:
+	# 		print("You are storing a card. Please select card to store.")
+	# 		column = int(input("COLUMN: "))
+	# 		game.store_card(column)
+	# 	except:
+	# 		print("INVALID INPUT")
+	# elif choice == '3':
+	# 	game.store_from_deck()
+	# elif choice == '4':
+	# 	print("You are moving a card. Please select card to move.")
+	# 	try:
+	# 		column = int(input("COLUMN: "))
+	# 		row = int(input("ROW: "))
+	# 		print("Which column would you like to move it to?")
+	# 		new_column = int(input("COLUMN: "))
+	# 		game.make_move(column, row, new_column)
+	# 	except:
+	# 		print("INVALID INPUT")
+	# elif choice == '5':
+	# 	try:
+	# 		print("You are moving a card from the deck. Please select column to move this card.")
+	# 		column = int(input("COLUMN: "))
+	# 		game.move_from_deck(column)
+	# 	except:
+	# 		print("INVALID INPUT")
+	# elif choice == '6':
+	# 	try:
+	# 		print("You are moving a card from the store. Please select the column of the card in store.")
+	# 		stored_card = int(input("STORE COLUMN: "))
+	# 		column = int(input("COLUMN ON BOARD: "))
+	# 		game.move_from_store(stored_card,column)
+	# 	except:
+	# 		print("INVALID INPUT")
+	# else:
+	# 	print("INVALID")
+	# if game.game_over():
+	# 	print("---------- YOU HAVE WON THE GAME ----------")
+	# 	break
 	game_manager.update_screen(game)
-	print("1: Draw from deck.")
-	print("2: Store a card from board.")
-	print("3: Store a card from deck.")
-	print("4: Move a card on the board.")
-	print("5: Move a card from the deck.")
-	print("6: Move a card from the store.")
-	choice = input("What would you like to do: ")
-	if choice == '1':
-		game.draw_deck()
-	elif choice == '2':
-		try:
-			print("You are storing a card. Please select card to store.")
-			column = int(input("COLUMN: "))
-			game.store_card(column)
-		except:
-			print("INVALID INPUT")
-	elif choice == '3':
-		game.store_from_deck()
-	elif choice == '4':
-		print("You are moving a card. Please select card to move.")
-		try:
-			column = int(input("COLUMN: "))
-			row = int(input("ROW: "))
-			print("Which column would you like to move it to?")
-			new_column = int(input("COLUMN: "))
-			game.make_move(column, row, new_column)
-		except:
-			print("INVALID INPUT")
-	elif choice == '5':
-		try:
-			print("You are moving a card from the deck. Please select column to move this card.")
-			column = int(input("COLUMN: "))
-			game.move_from_deck(column)
-		except:
-			print("INVALID INPUT")
-	elif choice == '6':
-		try:
-			print("You are moving a card from the store. Please select the column of the card in store.")
-			stored_card = int(input("STORE COLUMN: "))
-			column = int(input("COLUMN ON BOARD: "))
-			game.move_from_store(stored_card,column)
-		except:
-			print("INVALID INPUT")
-	else:
-		print("INVALID")
-	if game.game_over():
-		print("---------- YOU HAVE WON THE GAME ----------")
-		break
+	dragging = False
+	for event in pygame.event.get():
+		if event.type == pygame.QUIT:
+			carryOn = False
+		elif event.type == pygame.MOUSEBUTTONDOWN:
+			if event.button == 1:
+				game_manager.drag_cards(game, event, clock)
 
-	# for event in pygame.event.get():
-	# 	if event.type == pygame.QUIT:
-	# 		carryOn = False
 	
-
-	# for stack in range(0,7):
-	# 	for card in range(stack+1):
-	# 		rect = pygame.Rect(x_pos[stack].x, horz_slice1.y + (card*self.buffer), card_width, card_height)
-	# 		if card % 2 == 0:
-	# 			text = font.render("K", True, BLACK, WHITE)
-	# 			pygame.draw.rect(screen, WHITE, rect)
-	# 		else:
-	# 			text = font.render("K", True, BLACK, RED)
-	# 			pygame.draw.rect(screen, RED, rect)
-	# 		screen.blit(text, rect)
 	clock.tick(60)
 	pygame.display.flip()
 
