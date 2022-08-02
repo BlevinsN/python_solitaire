@@ -35,7 +35,7 @@ class Solitaire:
 		storage = []
 		for suit in self.stored:
 			if type(suit) == Card:
-				storage.append(suit.show_card())
+				storage.append(suit)
 			else:
 				storage.append("EMPTY")
 		return storage
@@ -397,8 +397,8 @@ while carryOn:
 			carryOn = False
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 			if event.button == 1:
-				move = game_manager.drag_cards(game, event, clock)
-				game.make_move(move[0],move[1],move[2])
+				if not game_manager.deck_card(game, event, clock):
+					game_manager.drag_cards(game, event, clock)
 
 	
 	clock.tick(60)
