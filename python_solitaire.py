@@ -42,9 +42,9 @@ class Solitaire:
 
 	def get_deck_cards(self):
 		if len(self.deck) > 1:
-			return [self.deck[0].show_card(), self.deck[1].show_card()]
+			return [self.deck[0], self.deck[1]]
 		elif len(self.deck) > 0:
-			return [self.deck[0].show_card(), "EMPTY"]
+			return [self.deck[0], "EMPTY"]
 		else:
 			return ["EMPTY", "EMPTY"]
 
@@ -397,8 +397,9 @@ while carryOn:
 			carryOn = False
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 			if event.button == 1:
-				if not game_manager.deck_card(game, event, clock):
-					game_manager.drag_cards(game, event, clock)
+				game_manager.deck_card(game, event)
+				game_manager.drag_cards(game, event, clock)
+				game_manager.drag_deck(game, event, clock)
 
 	
 	clock.tick(60)

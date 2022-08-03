@@ -56,16 +56,19 @@ class Pygame_Solitaire_Manager:
 		for suit in range(len(game_storage)):
 			pygame.draw.rect(self.screen, WHITE, self.storage[suit])
 			if type(game_storage[suit]) == Card:
-				text = self.font.render(game_storage[suit].show_card(), True, BLACK, WHITE)
+				if game_storage[suit] != omit:
+					text = self.font.render(game_storage[suit].show_card(), True, BLACK, WHITE)
+					self.screen.blit(text, self.storage[suit])
 			else:
 				text = self.font.render(game_storage[suit], True, BLACK, WHITE)
 			self.screen.blit(text, self.storage[suit])
 
 		top_deck_cards = game.get_deck_cards()
 		if top_deck_cards[0] != "EMPTY":
-			pygame.draw.rect(self.screen, WHITE, self.deck_showing)
-			text = self.font.render( str(top_deck_cards[0]), True, BLACK, WHITE)
-			self.screen.blit(text, self.deck_showing)
+			if top_deck_cards[0] != omit:
+				pygame.draw.rect(self.screen, WHITE, self.deck_showing)
+				text = self.font.render( str(top_deck_cards[0].show_card()), True, BLACK, WHITE)
+				self.screen.blit(text, self.deck_showing)
 		if top_deck_cards[1] != "EMPTY":
 			pygame.draw.rect(self.screen, WHITE, self.deck_hidden)
 
@@ -116,14 +119,12 @@ class Pygame_Solitaire_Manager:
 								game.make_move(old_x[0],old_y[0],new_x[0])
 								self.update_screen(game)
 								return
-							else:
-								new_location = look_in_storage(game, event)
-								if new_location:
-									old_x, old_y = np.where(game.get_board() == to_move[1])
-									game.store_card(old_x[0])
-									self.update_screen(game)
-									return
-
+							new_location = look_in_storage(game, event)
+							if new_location:
+								old_x, old_y = np.where(game.get_board() == to_move[1])
+								game.store_card(old_x[0])
+								self.update_screen(game)
+								return
 							dragging = False
 					elif event.type == pygame.MOUSEMOTION:
 						mouse_x, mouse_y = event.pos
@@ -137,7 +138,7 @@ class Pygame_Solitaire_Manager:
 				clock.tick(60)
 			return
 
-	def deck_card(self, game, mouse_event,clock):
+	def deck_card(self, game, mouse_event):
 		if self.deck_hidden.collidepoint(mouse_event.pos):
 			dragging = True
 			while dragging:
@@ -149,6 +150,58 @@ class Pygame_Solitaire_Manager:
 						else:
 							return False
 
+	def drag_deck(self, game, mouse_event,clock):
+		def look_in_stack(game, mouse_event):
+			game_board = game.get_board()
+			for stack in range(len(game_board)):
+				for card in range(len(game_board[stack])):
+					rect = pygame.Rect(self.x_pos[card].x, self.horz_slice1.y + (stack*self.buffer)+30, self.card_width, self.card_height)
+					if type(game_board[stack][card]) == Card:
+						if not game_board[stack][card].is_hidden():
+							if rect.collidepoint(mouse_event.pos):
+								return [rect, game_board[stack][card]]
+			return
+		def look_in_storage(game, mouse_event):
+			for rect in range(len(self.storage)):
+				if self.storage[rect].collidepoint(mouse_event.pos):
+					return self.storage[rect]
+			return
+		def look_in_deck(game, mouse_event):
+			if self.deck_showing.collidepoint(mouse_event.pos):
+				return [self.deck_showing, game.get_deck_cards()[0]]
+		to_move = look_in_deck(game, mouse_event)
+		if to_move:
+			dragging = True
+			mouse_x, mouse_y = mouse_event.pos
+			offset_x = to_move[0].x - mouse_x
+			offset_y = to_move[0].y - mouse_y
+			while dragging:
+				for event in pygame.event.get():
+					if event.type == pygame.MOUSEBUTTONUP:
+						if event.button == 1:
+							new_location = look_in_stack(game,event)
+							if new_location:
+								new_x, new_y = np.where(game.get_board() == new_location[1])
+								game.move_from_deck(new_x[0])
+								game.draw_deck()
+							new_location = look_in_storage(game, event)
+							if new_location:
+								game.store_from_deck()
+								game.draw_deck()
+							self.update_screen(game)
+
+							dragging = False
+					elif event.type == pygame.MOUSEMOTION:
+						mouse_x, mouse_y = event.pos
+						to_move[0].x = mouse_x + offset_x
+						to_move[0].y = mouse_y + offset_y
+				self.update_screen(game, to_move[1])
+				pygame.draw.rect(self.screen, WHITE, to_move[0])
+				text = self.font.render( to_move[1].show_card(), True, BLACK, WHITE)
+				self.screen.blit(text, to_move[0])
+				pygame.display.flip()
+				clock.tick(60)
+			return
 
 
 
