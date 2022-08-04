@@ -341,7 +341,6 @@ game_manager = Pygame_Solitaire_Manager(screen)
 carryOn = True
 clock = pygame.time.Clock()
 while carryOn:
-	game.print_board(screen)
 	# print("1: Draw from deck.")
 	# print("2: Store a card from board.")
 	# print("3: Store a card from deck.")

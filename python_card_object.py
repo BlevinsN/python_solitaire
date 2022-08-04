@@ -36,7 +36,7 @@ class Deck:
 		self.build()
 
 	def build(self):
-		for suit in ["♥","♦","♣","♠"]:
+		for suit in ["\u2663","\u2660","\u2666","\u2665"]:
 			for rank in range(1,14):
 				self.cards.append(Card(rank, suit))
 				

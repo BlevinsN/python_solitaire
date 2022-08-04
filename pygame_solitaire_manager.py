@@ -114,9 +114,11 @@ class Pygame_Solitaire_Manager:
 						if event.button == 1:
 							new_location = look_in_stack(game,event)
 							if new_location:
+								game.print_board(self.screen)
 								old_x, old_y = np.where(game.get_board() == to_move[1])
 								new_x, new_y = np.where(game.get_board() == new_location[1])
-								game.make_move(old_x[0],old_y[0],new_x[0])
+								print(old_x[0], old_y[0], new_x[0])
+								game.make_move(old_y[0],old_x[0],new_y[0])
 								self.update_screen(game)
 								return
 							new_location = look_in_storage(game, event)
@@ -179,17 +181,18 @@ class Pygame_Solitaire_Manager:
 				for event in pygame.event.get():
 					if event.type == pygame.MOUSEBUTTONUP:
 						if event.button == 1:
+							game.print_board(self.screen)
 							new_location = look_in_stack(game,event)
 							if new_location:
 								new_x, new_y = np.where(game.get_board() == new_location[1])
-								game.move_from_deck(new_x[0])
+								game.move_from_deck(new_y[0])
 								game.draw_deck()
 							new_location = look_in_storage(game, event)
 							if new_location:
 								game.store_from_deck()
 								game.draw_deck()
 							self.update_screen(game)
-
+							self.deck_showing = pygame.Rect(self.vert_slice1.x, self.horz_slice6.y, self.card_width, self.card_height)
 							dragging = False
 					elif event.type == pygame.MOUSEMOTION:
 						mouse_x, mouse_y = event.pos
