@@ -61,7 +61,7 @@ class Pygame_Solitaire_Manager:
 					self.screen.blit(text, self.storage[suit])
 			else:
 				text = self.font.render(game_storage[suit], True, BLACK, WHITE)
-			self.screen.blit(text, self.storage[suit])
+				self.screen.blit(text, self.storage[suit])
 
 		top_deck_cards = game.get_deck_cards()
 		if top_deck_cards[0] != "EMPTY":
@@ -117,16 +117,22 @@ class Pygame_Solitaire_Manager:
 								game.print_board(self.screen)
 								old_x, old_y = np.where(game.get_board() == to_move[1])
 								new_x, new_y = np.where(game.get_board() == new_location[1])
-								print(old_x[0], old_y[0], new_x[0])
 								game.make_move(old_y[0],old_x[0],new_y[0])
 								self.update_screen(game)
 								return
 							new_location = look_in_storage(game, event)
 							if new_location:
 								old_x, old_y = np.where(game.get_board() == to_move[1])
-								game.store_card(old_x[0])
+								game.store_card(old_y[0])
 								self.update_screen(game)
 								return
+							if to_move[1].get_rank() == 'K':
+								for rect in self.x_pos:
+									if rect.collidepoint(event.pos):
+										old_x, old_y = np.where(game.get_board() == to_move[1])
+										game.make_move(old_y[0],old_x[0], self.x_pos.index(rect))
+										self.update_screen(game)
+										return
 							dragging = False
 					elif event.type == pygame.MOUSEMOTION:
 						mouse_x, mouse_y = event.pos
@@ -191,8 +197,12 @@ class Pygame_Solitaire_Manager:
 							if new_location:
 								game.store_from_deck()
 								game.draw_deck()
-							self.update_screen(game)
+							if to_move[1].get_rank() == 'K':
+								for rect in self.x_pos:
+									if rect.collidepoint(event.pos):
+										game.move_from_deck(self.x_pos.index(rect))
 							self.deck_showing = pygame.Rect(self.vert_slice1.x, self.horz_slice6.y, self.card_width, self.card_height)
+							self.update_screen(game)
 							dragging = False
 					elif event.type == pygame.MOUSEMOTION:
 						mouse_x, mouse_y = event.pos
