@@ -59,9 +59,6 @@ class Pygame_Solitaire_Manager:
 				if game_storage[suit] != omit:
 					text = self.font.render(game_storage[suit].show_card(), True, BLACK, WHITE)
 					self.screen.blit(text, self.storage[suit])
-				else:
-					text = self.font.render("", True, BLACK, WHITE)
-					self.screen.blit(text, self.storage[suit])
 			else:
 				text = self.font.render(game_storage[suit], True, BLACK, WHITE)
 				self.screen.blit(text, self.storage[suit])
@@ -235,13 +232,21 @@ class Pygame_Solitaire_Manager:
 								return [rect, game_board[stack][card]]
 			return
 		def look_in_storage(game, mouse_event):
-			for rect in range(len(self.storage)):
-				if self.storage[rect].collidepoint(mouse_event.pos):
+			hearts = pygame.Rect(self.vert_slice3.x, self.horz_slice0.y, self.card_width, self.card_height)
+			diamonds = pygame.Rect(self.vert_slice4.x, self.horz_slice0.y, self.card_width, self.card_height)
+			spades = pygame.Rect(self.vert_slice5.x, self.horz_slice0.y, self.card_width, self.card_height)
+			clubs = pygame.Rect(self.vert_slice6.x, self.horz_slice0.y, self.card_width, self.card_height)
+			storage_pos = [hearts, diamonds, spades, clubs]
+			for rect in range(len(storage_pos)):
+				if storage_pos[rect].collidepoint(mouse_event.pos):
 					game_storage = game.get_storage()
-					return [self.storage[rect], game_storage[rect], rect]
+					return [storage_pos[rect], game_storage[rect], rect]
 			return
 		to_move = look_in_storage(game, mouse_event)
 		if to_move:
+			if type(to_move[1]) != Card:
+				return
+			to_return = to_move[0]
 			dragging = True
 			mouse_x, mouse_y = mouse_event.pos
 			offset_x = to_move[0].x - mouse_x
@@ -255,22 +260,18 @@ class Pygame_Solitaire_Manager:
 							if new_location:
 								new_x, new_y = np.where(game.get_board() == new_location[1])
 								game.move_from_store(to_move[2], new_y[0])
-							if to_move[1].get_rank() == 'K':
-								for rect in self.x_pos:
-									if rect.collidepoint(event.pos):
-										game.move_from_deck(self.x_pos.index(rect))
+							self.update_screen(game)
 							dragging = False
 					elif event.type == pygame.MOUSEMOTION:
 						mouse_x, mouse_y = event.pos
 						to_move[0].x = mouse_x + offset_x
 						to_move[0].y = mouse_y + offset_y
-						self.update_screen(game, to_move[1])
-					self.update_screen(game, to_move[1])
-				pygame.draw.rect(self.screen, WHITE, to_move[0])
-				text = self.font.render( to_move[1].show_card(), True, BLACK, WHITE)
-				self.screen.blit(text, to_move[0])
-				pygame.display.flip()
-				clock.tick(60)
+						self.update_screen(game,to_move[1])
+						pygame.draw.rect(self.screen, WHITE, to_move[0])
+						text = self.font.render( to_move[1].show_card(), True, BLACK, WHITE)
+						self.screen.blit(text, to_move[0])
+						pygame.display.flip()
+						clock.tick(60)
 			return
 
 
