@@ -399,6 +399,7 @@ while carryOn:
 				game_manager.deck_card(game, event)
 				game_manager.drag_cards(game, event, clock)
 				game_manager.drag_deck(game, event, clock)
+				game_manager.drag_storage(game,event, clock)
 
 	
 	clock.tick(60)
