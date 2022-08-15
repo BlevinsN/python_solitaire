@@ -8,14 +8,15 @@ GREEN = ( 0, 255, 0)
 RED = ( 255, 0, 0)
 
 class Pygame_Solitaire_Manager:
-	def __init__(self, screen):
+	def __init__(self, screen, game):
+		self.game = game
 		self.screen = screen
 		self.screen.fill(BLACK)
-		self.font = pygame.font.SysFont("None", 20)
+		self.font = pygame.font.SysFont("None", 18)
 		area = self.screen.get_rect()
 		width = area.width
 		height = area.height
-		self.buffer = 10
+		self.buffer = 12
 		self.row_width = (width / 7) - (2*self.buffer)
 		self.card_width = self.row_width - (2*self.buffer)
 		self.row_height = self.card_width * (5/4)
@@ -51,7 +52,7 @@ class Pygame_Solitaire_Manager:
 
 	def update_screen(self, game, omit=None):
 		self.screen.fill(BLACK)
-		game_storage = game.get_storage()
+		game_storage = self.game.stored
 
 		for suit in range(len(game_storage)):
 			pygame.draw.rect(self.screen, WHITE, self.storage[suit])
@@ -74,32 +75,34 @@ class Pygame_Solitaire_Manager:
 
 		game_board = game.get_board()
 		omit_col = -1
-		for stack in range(len(game_board)):
-			for card in range(len(game_board[stack])):
-				rect = pygame.Rect(self.x_pos[card].x, self.horz_slice1.y + (stack*self.buffer)+30, self.card_width, self.card_height)
-				if type(game_board[stack][card]) == Card:
-					if game_board[stack][card] != omit:
-						if omit_col != card:
+		for x in range(len(self.game.board)):
+			for y in range(len(self.game.board[x])):
+				outer_rect = pygame.Rect(self.x_pos[y].x, self.horz_slice1.y + (x*self.buffer)+30, self.card_width, self.card_height)
+				rect = pygame.Rect(self.x_pos[y].x+1, self.horz_slice1.y + (x*self.buffer)+31, self.card_width-2, self.card_height-2)
+				if type(game_board[x][y]) == Card:
+					if game_board[x][y] != omit:
+						if omit_col != y:
+							pygame.draw.rect(self.screen, BLACK, outer_rect)
 							pygame.draw.rect(self.screen, WHITE, rect)
-							if game_board[stack][card].is_hidden():
+							if game_board[x][y].is_hidden():
 								text = self.font.render( '', True, BLACK, WHITE)
 							else:
-								text = self.font.render( str(game_board[stack][card].show_card()), True, BLACK, WHITE)
+								text = self.font.render( str(game_board[x][y].show_card()), True, BLACK, WHITE)
 							self.screen.blit(text, rect)
 					else:
-						omit_col = card
+						omit_col = y
 		return
+
 
 	def drag_cards(self, game, mouse_event,clock):
 		def look_in_stack(game, mouse_event):
-			game_board = game.get_board()
-			for stack in range(len(game_board)):
-				for card in range(len(game_board[stack])):
-					rect = pygame.Rect(self.x_pos[card].x, self.horz_slice1.y + (stack*self.buffer)+30, self.card_width, self.card_height)
-					if type(game_board[stack][card]) == Card:
-						if not game_board[stack][card].is_hidden():
+			for x in range(len(self.game.board)-1,-1,-1):
+				for y in range(len(self.game.board[x])-1,-1,-1):
+					rect = pygame.Rect(self.x_pos[y].x, self.horz_slice1.y + (x*self.buffer)+30, self.card_width, self.card_height)
+					if type(self.game.board[x][y]) == Card:
+						if not self.game.board[x][y].is_hidden():
 							if rect.collidepoint(mouse_event.pos):
-								return [rect, game_board[stack][card]]
+								return [rect, self.game.board[x][y]]
 			return
 		def look_in_storage(game, mouse_event):
 			for rect in range(len(self.storage)):
@@ -112,6 +115,7 @@ class Pygame_Solitaire_Manager:
 			mouse_x, mouse_y = mouse_event.pos
 			offset_x = to_move[0].x - mouse_x
 			offset_y = to_move[0].y - mouse_y
+			old_x, old_y = np.where(self.game.board == to_move[1])
 			while dragging:
 				for event in pygame.event.get():
 					if event.type == pygame.MOUSEBUTTONUP:
@@ -119,21 +123,18 @@ class Pygame_Solitaire_Manager:
 							new_location = look_in_stack(game,event)
 							if new_location:
 								game.print_board(self.screen)
-								old_x, old_y = np.where(game.get_board() == to_move[1])
-								new_x, new_y = np.where(game.get_board() == new_location[1])
+								new_x, new_y = np.where(self.game.board == new_location[1])
 								game.make_move(old_y[0],old_x[0],new_y[0])
 								self.update_screen(game)
 								return
 							new_location = look_in_storage(game, event)
 							if new_location:
-								old_x, old_y = np.where(game.get_board() == to_move[1])
 								game.store_card(old_y[0])
 								self.update_screen(game)
 								return
 							if to_move[1].get_rank() == 'K':
 								for rect in self.x_pos:
 									if rect.collidepoint(event.pos):
-										old_x, old_y = np.where(game.get_board() == to_move[1])
 										game.make_move(old_y[0],old_x[0], self.x_pos.index(rect))
 										self.update_screen(game)
 										return
@@ -143,9 +144,18 @@ class Pygame_Solitaire_Manager:
 						to_move[0].x = mouse_x + offset_x
 						to_move[0].y = mouse_y + offset_y
 				self.update_screen(game, to_move[1])
-				pygame.draw.rect(self.screen, WHITE, to_move[0])
-				text = self.font.render( to_move[1].show_card(), True, BLACK, WHITE)
-				self.screen.blit(text, to_move[0])
+				#pygame.draw.rect(self.screen, WHITE, to_move[0])
+				for y in range(old_y[0], len(self.game.board[old_x[0]])):
+					if type(self.game.board[y][old_x[0]]) == Card:
+						index = y - (old_y[0])
+						outer_rect = pygame.Rect(to_move[0].x, to_move[0].y + (index*10), self.card_width, self.card_height)
+						rect = pygame.Rect(outer_rect.x+1, outer_rect.y+1, self.card_width-2, self.card_height-2)
+						pygame.draw.rect(self.screen, BLACK, outer_rect)
+						pygame.draw.rect(self.screen, WHITE, rect)
+						text = self.font.render( str(self.game.board[y][old_x[0]].show_card()), True, BLACK, WHITE)
+						self.screen.blit(text, rect)
+				#text = self.font.render( to_move[1].show_card(), True, BLACK, WHITE)
+				#self.screen.blit(text, to_move[0])
 				pygame.display.flip()
 				clock.tick(60)
 			return
@@ -164,14 +174,13 @@ class Pygame_Solitaire_Manager:
 
 	def drag_deck(self, game, mouse_event,clock):
 		def look_in_stack(game, mouse_event):
-			game_board = game.get_board()
-			for stack in range(len(game_board)):
-				for card in range(len(game_board[stack])):
-					rect = pygame.Rect(self.x_pos[card].x, self.horz_slice1.y + (stack*self.buffer)+30, self.card_width, self.card_height)
-					if type(game_board[stack][card]) == Card:
-						if not game_board[stack][card].is_hidden():
+			for x in range(len(self.game.board)-1,-1,-1):
+				for y in range(len(self.game.board[x])-1,-1,-1):
+					rect = pygame.Rect(self.x_pos[y].x, self.horz_slice1.y + (x*self.buffer)+30, self.card_width, self.card_height)
+					if type(self.game.board[x][y]) == Card:
+						if not self.game.board[x][y].is_hidden():
 							if rect.collidepoint(mouse_event.pos):
-								return [rect, game_board[stack][card]]
+								return [rect, self.game.board[x][y]]
 			return
 		def look_in_storage(game, mouse_event):
 			for rect in range(len(self.storage)):
@@ -196,11 +205,9 @@ class Pygame_Solitaire_Manager:
 							if new_location:
 								new_x, new_y = np.where(game.get_board() == new_location[1])
 								game.move_from_deck(new_y[0])
-								game.draw_deck()
 							new_location = look_in_storage(game, event)
 							if new_location:
 								game.store_from_deck()
-								game.draw_deck()
 							if to_move[1].get_rank() == 'K':
 								for rect in self.x_pos:
 									if rect.collidepoint(event.pos):
@@ -222,14 +229,13 @@ class Pygame_Solitaire_Manager:
 
 	def drag_storage(self, game, mouse_event,clock):
 		def look_in_stack(game, mouse_event):
-			game_board = game.get_board()
-			for stack in range(len(game_board)):
-				for card in range(len(game_board[stack])):
-					rect = pygame.Rect(self.x_pos[card].x, self.horz_slice1.y + (stack*self.buffer)+30, self.card_width, self.card_height)
-					if type(game_board[stack][card]) == Card:
-						if not game_board[stack][card].is_hidden():
+			for x in range(len(self.game.board)-1,-1,-1):
+				for y in range(len(self.game.board[x])-1,-1,-1):
+					rect = pygame.Rect(self.x_pos[y].x, self.horz_slice1.y + (x*self.buffer)+30, self.card_width, self.card_height)
+					if type(self.game.board[x][y]) == Card:
+						if not self.game.board[x][y].is_hidden():
 							if rect.collidepoint(mouse_event.pos):
-								return [rect, game_board[stack][card]]
+								return [rect, self.game.board[x][y]]
 			return
 		def look_in_storage(game, mouse_event):
 			hearts = pygame.Rect(self.vert_slice3.x, self.horz_slice0.y, self.card_width, self.card_height)
