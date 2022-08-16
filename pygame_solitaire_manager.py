@@ -144,18 +144,20 @@ class Pygame_Solitaire_Manager:
 						to_move[0].x = mouse_x + offset_x
 						to_move[0].y = mouse_y + offset_y
 				self.update_screen(game, to_move[1])
-				#pygame.draw.rect(self.screen, WHITE, to_move[0])
-				for y in range(old_y[0], len(self.game.board[old_x[0]])):
-					if type(self.game.board[y][old_x[0]]) == Card:
-						index = y - (old_y[0])
-						outer_rect = pygame.Rect(to_move[0].x, to_move[0].y + (index*10), self.card_width, self.card_height)
-						rect = pygame.Rect(outer_rect.x+1, outer_rect.y+1, self.card_width-2, self.card_height-2)
-						pygame.draw.rect(self.screen, BLACK, outer_rect)
-						pygame.draw.rect(self.screen, WHITE, rect)
-						text = self.font.render( str(self.game.board[y][old_x[0]].show_card()), True, BLACK, WHITE)
-						self.screen.blit(text, rect)
-				#text = self.font.render( to_move[1].show_card(), True, BLACK, WHITE)
-				#self.screen.blit(text, to_move[0])
+				pygame.draw.rect(self.screen, WHITE, to_move[0])
+				text = self.font.render( to_move[1].show_card(), True, BLACK, WHITE)
+				self.screen.blit(text, to_move[0])
+				x = old_x[0]+1
+				while type(self.game.board[x][old_y[0]]) == Card:
+					index = x - (old_x[0])
+					print(index)
+					outer_rect = pygame.Rect(to_move[0].x, to_move[0].y + (index*10), self.card_width, self.card_height)
+					rect = pygame.Rect(outer_rect.x+1, outer_rect.y+1, self.card_width-2, self.card_height-2)
+					pygame.draw.rect(self.screen, BLACK, outer_rect)
+					pygame.draw.rect(self.screen, WHITE, rect)
+					text = self.font.render( str(self.game.board[x][old_y[0]].show_card()), True, BLACK, WHITE)
+					self.screen.blit(text, rect)
+					x+=1
 				pygame.display.flip()
 				clock.tick(60)
 			return
