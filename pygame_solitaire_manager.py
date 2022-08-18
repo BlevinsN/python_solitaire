@@ -11,7 +11,7 @@ class Pygame_Solitaire_Manager:
 	def __init__(self, screen, game):
 		self.game = game
 		self.screen = screen
-		self.screen.fill(RED)
+		self.screen.fill(GREEN)
 		self.font = pygame.font.SysFont("None", 18)
 		area = self.screen.get_rect()
 		width = area.width
@@ -50,8 +50,29 @@ class Pygame_Solitaire_Manager:
 		self.deck_hidden = pygame.Rect(self.vert_slice0.x, self.horz_slice6.y, self.card_width, self.card_height)
 		self.deck_showing = pygame.Rect(self.vert_slice1.x, self.horz_slice6.y, self.card_width, self.card_height)
 
+	def draw_card(self, card, rect):
+		card_rank = card.get_rank()
+		card_suit = card.get_suit()
+		if not card.is_hidden():
+			rank_text = self.font.render(str(card_rank), True, BLACK, WHITE)
+			if card_suit == "\u2660":
+				image = pygame.image.load('spade.jpg')
+			elif card_suit == "\u2663":
+				image = pygame.image.load('club.jpg')
+			elif card_suit == "\u2666":
+				image = pygame.image.load('diamond.png')
+			elif card_suit == "\u2665":
+				image = pygame.image.load('heart.png')
+			center_image = pygame.transform.scale(image, (self.card_height/2, self.card_width/2))
+			top_image = pygame.transform.scale(image, (self.card_height/6, self.card_width/6))
+			self.screen.blit(center_image, (rect.centerx-(self.card_width/4),rect.centery-(self.card_height/4)))
+			self.screen.blit(top_image, (rect.topright[0]-(self.card_width/6),rect.topright[1]))
+			self.screen.blit(rank_text, rect)
+		return 
+
+
 	def update_screen(self, game, omit=None):
-		self.screen.fill(RED)
+		self.screen.fill(GREEN)
 		game_storage = self.game.stored
 
 		for suit in range(len(game_storage)):
@@ -61,8 +82,7 @@ class Pygame_Solitaire_Manager:
 			pygame.draw.rect(self.screen, WHITE, rect)
 			if type(game_storage[suit]) == Card:
 				if game_storage[suit] != omit:
-					text = self.font.render(game_storage[suit].show_card(), True, BLACK, WHITE)
-					self.screen.blit(text, rect)
+					self.draw_card(game_storage[suit], rect)
 			else:
 				text = self.font.render(game_storage[suit], True, BLACK, WHITE)
 				self.screen.blit(text, rect)
@@ -74,8 +94,7 @@ class Pygame_Solitaire_Manager:
 				rect = pygame.Rect(outer_rect.x+2, outer_rect.y+2, self.card_width-4, self.card_height-4)
 				pygame.draw.rect(self.screen, BLACK, outer_rect)
 				pygame.draw.rect(self.screen, WHITE, rect)
-				text = self.font.render( str(top_deck_cards[0].show_card()), True, BLACK, WHITE)
-				self.screen.blit(text, rect)
+				self.draw_card(top_deck_cards[0], rect)
 		if top_deck_cards[1] != "EMPTY":
 			outer_rect = self.deck_hidden
 			rect = pygame.Rect(outer_rect.x+2, outer_rect.y+2, self.card_width-4, self.card_height-4)
@@ -93,11 +112,7 @@ class Pygame_Solitaire_Manager:
 						if omit_col != y:
 							pygame.draw.rect(self.screen, BLACK, outer_rect,2,2)
 							pygame.draw.rect(self.screen, WHITE, rect)
-							if game_board[x][y].is_hidden():
-								text = self.font.render( '', True, BLACK, WHITE)
-							else:
-								text = self.font.render( str(game_board[x][y].show_card()), True, BLACK, WHITE)
-							self.screen.blit(text, rect)
+							self.draw_card(game_board[x][y], rect)
 					else:
 						omit_col = y
 		return
@@ -157,8 +172,7 @@ class Pygame_Solitaire_Manager:
 				rect = pygame.Rect(outer_rect.x+2, outer_rect.y+2, self.card_width-4, self.card_height-4)
 				pygame.draw.rect(self.screen, BLACK, outer_rect,2,2)
 				pygame.draw.rect(self.screen, WHITE, rect)
-				text = self.font.render( to_move[1].show_card(), True, BLACK, WHITE)
-				self.screen.blit(text, rect)
+				self.draw_card(to_move[1],rect)
 				x = old_x[0]+1
 				while type(self.game.board[x][old_y[0]]) == Card:
 					index = x - (old_x[0])
@@ -166,8 +180,7 @@ class Pygame_Solitaire_Manager:
 					rect = pygame.Rect(outer_rect.x+2, outer_rect.y+2, self.card_width-4, self.card_height-4)
 					pygame.draw.rect(self.screen, BLACK, outer_rect,2,2)
 					pygame.draw.rect(self.screen, WHITE, rect)
-					text = self.font.render( str(self.game.board[x][old_y[0]].show_card()), True, BLACK, WHITE)
-					self.screen.blit(text, rect)
+					self.draw_card(self.game.board[x][old_y[0]],rect)
 					x+=1
 				pygame.display.flip()
 				clock.tick(60)
@@ -237,8 +250,7 @@ class Pygame_Solitaire_Manager:
 				rect = pygame.Rect(outer_rect.x+2, outer_rect.y+2, self.card_width-4, self.card_height-4)
 				pygame.draw.rect(self.screen, BLACK, outer_rect,2,2)
 				pygame.draw.rect(self.screen, WHITE, rect)
-				text = self.font.render( to_move[1].show_card(), True, BLACK, WHITE)
-				self.screen.blit(text, rect)
+				self.draw_card(to_move[1],rect)
 				pygame.display.flip()
 				clock.tick(60)
 			return
@@ -293,8 +305,7 @@ class Pygame_Solitaire_Manager:
 						rect = pygame.Rect(outer_rect.x+2, outer_rect.y+2, self.card_width-4, self.card_height-4)
 						pygame.draw.rect(self.screen, BLACK, outer_rect,2,2)
 						pygame.draw.rect(self.screen, WHITE, rect)
-						text = self.font.render( to_move[1].show_card(), True, BLACK, WHITE)
-						self.screen.blit(text, rect)
+						self.draw_card(to_move[1],rect)
 						pygame.display.flip()
 						clock.tick(60)
 			return
